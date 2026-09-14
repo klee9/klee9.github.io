@@ -24,7 +24,7 @@ To overcome this challenge, GR00T N1 was created with the goal of bringing physi
 
 <GR00TArchitecture />
 
-The GR00T N1 model is composed of two modules – the VLM backbone and the diffusion transformer. Specifically, GR00T N1 uses Eagle-2 VLM pre-trained on internet scale data to process images and texts, and a flow-matching action generator (DiT) to produce an action chunk.
+The GR00T N1 model is composed of two modules – the VLM backbone and the diffusion transformer. Specifically, GR00T N1 uses Eagle-2 VLM pre-trained on internet-scale data to process images and texts, and a flow-matching action generator (DiT) to produce an action chunk.
 
 One thing about using diverse embodiments during training is that their state and action spaces have varying sizes. To address this, GR00T N1 uses dedicated encoders to project states and actions to a shared embedding dimension. Here, the action encoder also encodes the diffusion timestep together with the noised action vector.
 
