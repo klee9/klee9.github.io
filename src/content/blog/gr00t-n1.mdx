@@ -1,0 +1,110 @@
+---
+title: 'GR00T N1'
+description: 'An Effective Paradigm for Tiny-Scale Vision-Language-Action Model'
+pubDate: 2026-09-12
+category: paper
+tags: ['VLA', 'robotics', 'NVIDIA']
+---
+
+import GR00TArchitecture from '../../components/figures/gr00t_n1/GR00TArchitecture';
+import DataPyramid from '../../components/figures/gr00t_n1/DataPyramid';
+import DexMimicGen from '../../components/figures/gr00t_n1/DexMimicGen';
+import Benchmarks from '../../components/figures/gr00t_n1/Benchmarks';
+
+## Why GR00T N1 was created
+The hardware of humanoid robots has advanced remarkably, enabling increasingly versatile capabilities and human-like physical forms. However, for humanoids to operate robustly in novel and unstructured environments, sophisticated physical intelligence is required.
+
+Such intelligence can be achieved through robot foundation models trained on massive and diverse datasets, allowing robots to understand open-ended objectives and perform a wide range of tasks.
+
+However, robotics has yet to reach the scale of data seen in other domains. There are certainly ongoing community efforts, such as the [OpenX-Embodiment](https://github.com/google-deepmind/open_x_embodiment) dataset, but these efforts remain fragmented, forming an archipelago of “data islands.”
+
+To overcome this challenge, GR00T N1 was created with the goal of bringing physical intelligence closer to the human level.
+
+## The GR00T N1 Model
+
+<GR00TArchitecture />
+
+The GR00T N1 model is composed of two modules – the VLM backbone and the diffusion transformer. Specifically, GR00T N1 uses Eagle-2 VLM pre-trained on internet scale data to process images and texts, and a flow-matching action generator (DiT) to produce an action chunk.
+
+One thing about using diverse embodiments during training is that their state and action spaces have varying sizes. To address this, GR00T N1 uses dedicated encoders to project states and actions to a shared embedding dimension. Here, the action encoder also encodes the diffusion timestep together with the noised action vector.
+
+The DiT takes: vision-language tokens from the VLM, encoded states and actions as input. Each DiT block consists of alternating cross-attention and self-attention blocks. The self-attention blocks attend to noised action token embeddings and state embeddings, while cross-attention blocks additionally attend to vision-language token embeddings.
+
+After the final DiT block, an embodiment-specific MLP (action decoder) is applied to produce actions.
+
+
+## Gathering data
+<DataPyramid />
+
+The training data for GR00T N1 forms a pyramid. The base consists of diverse human egocentric video data from open datasets, together with the web data used in VLM training. The second tier contains simulation trajectories and synthetic *neural* trajectories that are collected using pre-trained video generation models. The peak of the pyramid is in-house collected teleoperation trajectories.
+
+At a first glance, using human egocentric videos and web data for training GR00T N1 does not seem reasonable. Of course, it would make sense if it were for fine-tuning the VLM, but it is kept frozen. Then why would they use this kind of data, which seemingly doesn't contain any useful information to robots?
+
+### Latent action
+To utilize this data, a VQ-VAE is trained to generate *latent* actions. Suppose we have an image $x_t$ where a person sees an apple on the table, and a future image $x_{t+H}$ where the person's hand has moved toward the apple. Surely, some action has happened between these two frames. 
+
+The objective of the VQ-VAE is to learn this action. The encoder takes $x_t$ and $x_{t+H}$ as input to produce a latent action $z_t$, and the decoder reconstructs the future image. To reconstruct the future image, $z_t$ has to contain information about what action needs to happen to $x_t$ to get to $x_{t+H}$. This is why it's called a "latent" action.
+
+
+### Neural trajectories
+At the peak of the data pyramid is real-world robot data. This scales linearly with human labor as it typically requires humans to teleoperate the robot to produce each trajectory. To further increase the size of robotic data, a video generation model (WAN2.1-I2V-14B) is fine-tuned to generate video data.
+
+Given the initial frames, a multimodal LLM is instructed to detect objects and create more feasible combinations of "*pick up* \{*object*\} *from* \{*location A*\} *to* \{*location B*\}". Then, the video generation model creates videos corresponding to the image and the prompt. 
+
+To ensure the quality of the resulting videos, 8 frames are fed to a multimodal LLM that judges whether they adhere to the instructions. Videos that fail this criterion undergo re-captioning. As a result, 827 hours of data is collected from just 88 hours of real robot trajectories.
+
+### Simulation trajectories
+
+<DexMimicGen />
+
+Collecting data for humanoid robots is highly expensive as it requires simultaneously controlling both arms and hands. To address this, simulation (DexMimicGen) is used to decompose large human-demonstrated trajectories into smaller manipulation sequences, each corresponding to a subtask involving a single object.
+
+For example, instead of treating *pick up cup* → *move cup* → *place cup* as a single trajectory, DexMimicGen decomposes the demonstration into smaller object-centric manipulation sequences. These sequences can then be adapted to different simulated environments by aligning them with the corresponding object's new position while preserving the relative pose between the robot's end effector and the object.
+
+After transforming a sequence, DexMimicGen interpolates the motion between the robot's current state and the beginning of the transformed sequence to ensure smooth execution. The transformed sequence is then replayed in the simulator, and only trajectories that successfully complete the task are retained. In this way, a small number of human demonstrations can be automatically expanded into a large collection of diverse and successful simulation trajectories.
+
+As a result, 780,000 simulation trajectories were generated, corresponding to approximately 6,500 hours of human demonstration data, in just 11 hours. These synthetic trajectories can then supplement real-robot demonstrations, substantially increasing the amount of training data while minimizing the need for additional human teleoperation.
+
+## Training GR00T N1
+### Pre-Training
+During the pre-training phase, GR00T N1 is trained via flow-matching loss on data from the entire data pyramid. For human egocentric videos where ground truth actions don't exist, latent actions are used as flow-matching targets.
+
+### Post-Training
+In the post-training phase, the pre-trained model is fine-tuned on datasets corresponding to each single embodiment. As in pre-training, only the language model of the VLM backbone is kept frozen.
+
+To address data scarcity during post-training, the real-world data is augmented with neural trajectories. Diverse initial states are created through randomization in simulation or manual object-pose randomization in real-world settings. Since generated trajectories lack action labels, latent actions or inverse-dynamics-model (IDM) predictions are used as pseudo-labels. The policy is then trained jointly on real and generated trajectories with a 1:1 sampling ratio.
+
+## So how does it perform out-of-the-box?
+To evaluate the generalization capabilities of pre-trained checkpoint, two tasks are performed by the GR-1 humanoid robot. In the first task, the robot is instructed to place an object on the bottom shelf, requiring the robot to first grasp the object with its left hand, transfer it within reach of the right hand, and then complete the placement onto the shelf. In the second task, the robot is instructed to place a novel object into an unseen target container.
+
+The evaluation was performed on a pre-trained GR00T-N1-2B model using 5 different objects, measuring success rates. GR00T-N1-2B acheived 76.6% (11.5/15) and 73.3% (11/15) in first and second tasks, respectively. The high performance under these two evaluation settings illustrates the effectiveness of large-scale pre-training.
+
+## How about after post-training?
+
+|  | RoboCasa | DexMG | GR-1 | Average |
+|---|:---:|:---:|:---:|:---:|
+| BC Transformer | 26.3% | 53.9% | 16.1% | 26.4% |
+| Diffusion Policy | 25.6% | 56.1% | 32.7% | 33.4% |
+| GR00T-N1-2B | 32.1% | 66.5% | 50.0% | 45.0% |
+<br/>
+In simulation, post-trained GR00T N1 is compared against BC Transformer and Diffusion Policy in three simulation benchmarks. We can see that GR00T N1 consistently outperforms the baseline models.
+<br/>
+| Model | Pick-and-Place | Articulated | Industrial | Coordination | Average |
+|---|:---:|:---:|:---:|:---:|:---:|
+| Diffusion Policy (10% Data) | 3.0% | 14.3% | 6.7% | 27.5% | 10.2% |
+| Diffusion Policy (Full Data) | 36.0% | 38.6% | 61.0% | 62.5% | 46.4% |
+| GR00T-N1-2B (10% Data) | 35.0% | 62.0% | 31.0% | 50.0% | 42.6% |
+| **GR00T-N1-2B (Full Data)** | **82.0%** | **70.9%** | **70.0%** | **82.5%** | **76.8%** |
+<br/>
+On the real GR-1 humanoid, GR00T-N1-2B is compared against the Diffusion Policy, training on 10% of the human teleoperation dataset and the full dataset. GR00T-N1-2B achieves a significantly higher success rate across all tasks, outperforming Diffusion Policy by 32.4% in the 10% Data setting and by 30.4% in the Full Data setting. Notably, GR00T-N1-2B trained on just 10% of the data performs only 3.8% lower than Diffusion Policy trained on the full dataset, highlighting its data efficiency. 
+
+## Are neural trajectories really needed?
+<Benchmarks />
+<br/>
+To determine whether neural trajectories actually help, the base GR00T-N1-2B model is compared against three baselines: Diffusion Policy, GR00T-N1-2B + LAPA, and GR00T-N1-2B + IDM. LAPA learns embodiment-agnostic latent actions from visual transitions, while an IDM infers embodiment-specific robot actions from those transitions. The latter two baselines augment the training data with neural trajectories labeled using LAPA latent actions and IDM-inferred actions, respectively.
+
+The results show that GR00T N1 co-trained with neural trajectories consistently results in substantial gains compared to GR00T N1 trained only on real-world trajectories. Moreover, as more data becomes available, the performance gap between LAPA and IDM widens.
+
+## Conclusion
+
+GR00T N1 demonstrates promising performance, but it still has several limitations. First, the model primarily focuses on short-horizon tasks, limiting its ability to handle longer and more complex tasks. Second, the synthetic data generation techniques used in this work still face challenges in producing diverse and counterfactual data while adhering to physics. Addressing these limitations remains an important direction for future work.
