@@ -1314,3 +1314,97 @@
 		var(--shadow-lg),
 		inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
+
+/* ── Data mixture: one 100% stacked bar with a selectable legend ── */
+.mix__bar {
+	display: flex;
+	flex-direction: column-reverse; /* values sit above the bar */
+	gap: 0.3rem;
+}
+
+.mix__bar svg {
+	display: block;
+	width: 100%;
+	height: 46px;
+}
+
+.mix__seg {
+	cursor: pointer;
+	transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.mix__seg:hover {
+	opacity: 0.85;
+}
+
+.mix__seg.is-dim {
+	opacity: 0.22;
+}
+
+.mix__values {
+	display: flex;
+	gap: 2px;
+}
+
+.mix__value {
+	flex-grow: 0;
+	flex-shrink: 0;
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	color: var(--color-text-muted);
+	transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.mix__value.is-dim {
+	opacity: 0.3;
+}
+
+.mix__legend {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--space-xs) var(--space-md);
+	list-style: none;
+	padding: 0;
+	margin: var(--space-md) 0 0;
+}
+
+.mix__legend-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45em;
+	padding: 0.25em 0.6em;
+	border: 1px solid transparent;
+	border-radius: var(--radius-pill);
+	background: none;
+	font: inherit;
+	font-size: 0.8125rem;
+	color: var(--color-text-muted);
+	cursor: pointer;
+	transition:
+		color var(--dur-fast) var(--ease-out),
+		opacity var(--dur-fast) var(--ease-out),
+		border-color var(--dur-fast) var(--ease-out);
+}
+
+.mix__legend-btn:hover {
+	color: var(--color-text-bright);
+}
+
+.mix__legend-btn.is-active {
+	color: var(--color-text-bright);
+	border-color: var(--color-border-strong);
+}
+
+.mix__legend-btn.is-dim {
+	opacity: 0.45;
+}
+
+.mix__swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	flex: none;
+}
