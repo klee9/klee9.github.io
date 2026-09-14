@@ -1,0 +1,61 @@
+---
+title: 'GR00T N1.6'
+description: 'An Improved Open Foundation Model for Generalist Humanoid Robots'
+pubDate: 2026-09-14
+category: paper
+tags: ['VLA', 'robotics', 'NVIDIA']
+---
+
+import GR00TArchitecture from '../../components/figures/gr00t_n15/GR00TArchitecture';
+import Term from '../../components/Term';
+import DataMix from '../../components/figures/gr00t_n16/DataMix';
+import TaskProgress from '../../components/figures/gr00t_n16/TaskProgress';
+
+## What is GR00T N1.6?
+GR00T N1.6 is an improved version of [GR00T N1.5](/blog/gr00t-n15), with better post-training performance. 
+
+
+## So what changed from N1.5?
+### The architecture
+Architecturally, N1.6 brings several changes:
+
+- The VLM backbone is NVIDIA Cosmos-2B VLM variant. It supports flexible resolution, and can encode images in their native aspect ratio without padding.
+- The <Term note="Diffusion transformer: the part of the model that turns noise into an action sequence, conditioned on what the VLM saw and was told to do.">DiT</Term> is 2$\times$ larger (16 → 32 layers)
+- The post-VLM 4-layer transformer adapter of N1.5 is removed. Instead, the top 4 layers of the VLM is unfrozen during pre-training.
+- The model predicts state-relative action chunks for most embodiments, rather than absolute joint angles or end-effector positions.
+
+### The pre-training data mixture
+<DataMix />
+
+In addition to the data mixture used in pre-training for N1.5, N1.6 includes several thousand hours of teleoperated data from:
+
+- Bimanual YAM arms
+- AgiBot Genie1
+- Simulated Galaxea R1 Pro on the <Term note="A simulation benchmark of long-horizon household activities, used here as a source of training data generated in simulation.">BEHAVIOR</Term> suite
+- Whole-Body <Term note="Manipulating while moving: the robot has to walk or shift its base and use its arms as one combined problem, rather than in separate phases.">Locomanipulation</Term> with Unitree G1
+
+## Evaluation
+After pre-training for 300K steps, GR00T N1.6 is further post-trained on small task-specific datasets.
+
+<TaskProgress />
+
+The models were compared on fifteen real-robot tasks spanning four settings: bimanual YAM atomic skills and household chores, AgiBot household tasks, bimanual YAM industrial assembly, and Unitree G1 locomanipulation. Averaged over all fifteen, task progress rises from 60.9% to 83.3%.
+
+What stands out is where the gain comes from. The improvement is concentrated almost entirely on the tasks N1.5 handled badly: folding a t-shirt goes from 16.5% to 80%, cube pick & place from 33.8% to 98.8%, bar pick & place from 21.3% to 92.3%, and connecting a tube from 18.3% to 59.8%. Where N1.5 was already competent, the margin is thin — the three AgiBot household tasks move by 4, 2, and 0 points, and fruit to plate by 2.6.
+
+The single task where N1.6 does not win is bimanual YAM fruit pick & place, and there N1.5 was already at 100%, so the 5-point drop is noise against a ceiling rather than a regression worth reading into.
+
+Taken together, this looks less like a policy that is uniformly better and more like one whose failure modes have been repaired. That is consistent with the changes made in N1.6: a stronger VLM backbone and a DiT with twice the depth mostly buy accuracy on the cases the smaller model could not represent, while tasks that were already saturated have little room left to move.
+
+## Things that the authors found
+The N1.6 experiments are more demanding than those used for N1.5, requiring long-horizon reasoning, dexterity, and multi-tasking. Scaling them up surfaced a number of practical lessons.
+
+- Relative actions are used as the default action space for most embodiments. They produce smoother and more accurate motions than absolute actions, but on small datasets the errors accumulate and the model becomes worse at correcting itself.
+- Pre-training statistics help when the post-training task resembles the pre-training distribution. When the distributions differ the model underfits, so post-training statistics are used instead.
+- N1.6 converges faster than N1.5 and produces smoother actions, but it overfits more easily. Stronger state regularization, additional data augmentation, and co-training with pre-training data are used to regularize it during post-training.
+- <Term note="Dataset Aggregation: run the current policy, have an expert correct the states it actually reaches, add those to the training set, and repeat — so the model learns to recover from its own mistakes.">DAgger</Term> reliably improves performance, and is worth reaching for when the model underperforms in real-world rollouts.
+- RTC, applied at both train time and test time, improves motion smoothness and robustness during asynchronous rollouts. It is used in the Unitree G1 and bimanual YAM experiments.
+- Multi-task language following and out-of-distribution generalization remain difficult. Finer-grained subtask annotation improves language following, but not enough to generalize robustly.
+
+Overall, N1.6 improves over N1.5 across the embodiments tested, with the clearest gains in bimanual manipulation and locomanipulation.
+

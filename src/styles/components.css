@@ -1408,3 +1408,108 @@
 	border-radius: 3px;
 	flex: none;
 }
+
+/* ── N1.6 data mixture: sorted horizontal bars, grouped by kind ── */
+.mix16__svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	min-width: 520px;
+}
+
+
+
+.mix16__name {
+	font-size: 11.5px;
+	fill: var(--color-text);
+	text-anchor: end;
+}
+
+.mix16__value {
+	font-size: 11px;
+	fill: var(--color-text-subtle);
+	text-anchor: start;
+	font-variant-numeric: tabular-nums;
+}
+
+
+
+
+
+
+
+/* ── Task progress: N1.5 vs N1.6 grouped horizontal bars ── */
+.tp__svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	min-width: 560px;
+}
+
+.tp__grid {
+	fill: none;
+	stroke: var(--color-border);
+	stroke-width: 1;
+}
+
+.tp__grid--base {
+	stroke: var(--color-border-strong);
+}
+
+.tp__group {
+	font-size: 11.5px;
+	font-weight: 600;
+	fill: var(--color-text-bright);
+	text-anchor: start;
+}
+
+.tp__name {
+	font-size: 11px;
+	fill: var(--color-text);
+	text-anchor: end;
+}
+
+.tp__value {
+	font-size: 9.5px;
+	fill: var(--color-text-subtle);
+	text-anchor: start;
+	font-variant-numeric: tabular-nums;
+}
+
+.tp__tick {
+	font-size: 10px;
+	fill: var(--color-text-subtle);
+	text-anchor: middle;
+}
+
+.tp__axis-title {
+	font-size: 10.5px;
+	fill: var(--color-text-subtle);
+	text-anchor: middle;
+}
+
+.tp__legend {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--space-xs) var(--space-md);
+	list-style: none;
+	padding: 0;
+	margin: 0 0 var(--space-sm);
+	font-size: 0.8125rem;
+	color: var(--color-text-muted);
+}
+
+.tp__legend li {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45em;
+	margin: 0;
+}
+
+.tp__swatch {
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	flex: none;
+}
