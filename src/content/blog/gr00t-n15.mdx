@@ -40,7 +40,7 @@ The VLM of GR00T N1.5 is Eagle 2.5 tuned for better grounding capabilities and p
 The pre-training data mixture for GR00T N1.5 includes internal GR-1 data, OpenX-Embodiment, simulated GR-1 (DexMG), neural trajectories from DreamGen, and AgiBot-Beta. 
 
 ## Training GR00T N1.5
-GR00T N1.5 uses Future Latent Representation Alignment (FLARE) in addition to the flow-matching loss used in GR00T N1. Instead of only learning what action to take from the current observation, FLARE encourages the model to predict what the future state will look like in its latent representation. In other words, the model is encouraged to think about “what will happen next?” before deciding what action to take.
+GR00T N1.5 uses Future Latent Representation Alignment (FLARE) in addition to the flow matching loss used in GR00T N1. Instead of only learning what action to take from the current observation, FLARE encourages the model to predict what the future state will look like in its latent representation. In other words, the model is encouraged to think about “what will happen next?” before deciding what action to take.
 
 During training, the model is given the current observation as well as a future observation. It learns to make its predicted future representation similar to the representation of the actual future observation. The future observation is only used during training, so no future information is required during inference.
 
