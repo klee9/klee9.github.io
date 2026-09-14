@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+		<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="alternate" type="application/rss+xml" title="klee9" href="/rss.xml" />
+		<link rel="sitemap" href="/sitemap.xml" />
+		<script>
+			// Mark JS as available (scroll-reveal only hides content when this class is set),
+			// and apply the saved theme (or the OS preference) before first paint.
+			(() => {
+				document.documentElement.classList.add('js');
+				let t = null;
+				try {
+					t = localStorage.getItem('theme');
+				} catch {}
+				if (t !== 'light' && t !== 'dark') {
+					t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+				}
+				document.documentElement.dataset.theme = t;
+			})();
+		</script>
+	</head>
+	<body>
+		<div id="root"><!--app-html--></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>
