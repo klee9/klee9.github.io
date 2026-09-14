@@ -58,9 +58,9 @@ The N1 and N1.5 were trained from scratch on two simulation benchmarks that requ
 
 | Simulation Benchmark | GR00T N1 | GR00T N1.5 |
 |---|:---:|:---:|
-| RoboCasa (30 demos per task) | 17.4 | **47.5** |
-| Sim GR-1 (zero-shot) | 39.6 | **43.9%** |
-| Sim GR-1 (30 demos per task) | 43.2 | **47.4%** |
+| RoboCasa (30 demos per task) | 17.4% | **47.5%** |
+| Sim GR-1 (zero-shot) | 39.6% | **43.9%** |
+| Sim GR-1 (30 demos per task) | 43.2% | **47.4%** |
 <br/>
 As in GR00T N1, N1.5 is evaluated on data-limited post-training. For Sim GR-1, the model was evaluated both few-shot and zer-shot as the pre-training data includes them. Anyhow, the N1.5 records significantly better result in the very low data regime (zero-shot and 30 demos). 
 <br/>
@@ -70,7 +70,7 @@ As in GR00T N1, N1.5 is evaluated on data-limited post-training. For Sim GR-1, t
 | Language following rate | 46.6% | **93.3%** |
 | Overall success rate | 43.3% | **83.0%** |
 
-In the next experiment, two fruits are on a table and the robot is asked to place one of them onto a plate. The initial positoin of the target fruit is sampled to be closer to either the left or the right hand with 50% probability.
+In the next experiment, two fruits are on a table and the robot is asked to place one of them onto a plate. The initial position of the target fruit is sampled to be closer to either the left or the right hand with 50% probability.
 
 The results show that N1.5 significantly improves over the N1 in terms of language following on the real GR-1 robot.
 
