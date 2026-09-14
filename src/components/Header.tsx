@@ -2,10 +2,7 @@ import { Link, NavLink } from 'react-router-dom';
 import { SITE } from '../consts';
 import ThemeToggle from './ThemeToggle';
 
-const navLinks = [
-	{ href: '/blog', label: 'Blog' },
-	{ href: '/about', label: 'About' },
-];
+const navLinks = [{ href: '/about', label: 'About' }];
 
 export default function Header() {
 	return (

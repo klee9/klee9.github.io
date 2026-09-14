@@ -14,7 +14,7 @@ export default function Home() {
 			<PageMeta />
 			<section className="hero">
 				<div className="hero__inner container">
-					<p className="eyebrow rise">{SITE.tagline}</p>
+					{SITE.tagline && <p className="eyebrow rise">{SITE.tagline}</p>}
 					<h1 className="hero__title rise" style={{ '--rise-delay': '0.08s' } as CSSProperties}>
 						Writing on <span className="text-gradient">life</span>, <span className="text-gradient">papers</span>, and{' '}
 						<span className="text-gradient">code</span>.
@@ -22,16 +22,28 @@ export default function Home() {
 					<p className="hero__description rise" style={{ '--rise-delay': '0.16s' } as CSSProperties}>
 						{SITE.description}
 					</p>
-					<div className="hero__actions rise" style={{ '--rise-delay': '0.24s' } as CSSProperties}>
-						<Link to="/blog" className="btn btn--primary">
-							Read the blog
-						</Link>
-						<Link to="/about" className="btn btn--ghost">
-							About me
-						</Link>
-					</div>
 				</div>
 			</section>
+
+			{recentPosts.length > 0 && (
+				<section className="recent">
+					<div className="container">
+						<Reveal className="recent__header">
+							<h2 className="section-title">Recent posts</h2>
+							<Link to="/blog" className="recent__all">
+								View all ›
+							</Link>
+						</Reveal>
+						<div className="posts__grid">
+							{recentPosts.map((post, i) => (
+								<Reveal key={post.id} delay={i * 0.08}>
+									<PostCard post={post} />
+								</Reveal>
+							))}
+						</div>
+					</div>
+				</section>
+			)}
 
 			<section className="categories">
 				<div className="container">
@@ -56,26 +68,6 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
-
-			{recentPosts.length > 0 && (
-				<section className="recent">
-					<div className="container">
-						<Reveal className="recent__header">
-							<h2 className="section-title">Recent posts</h2>
-							<Link to="/blog" className="recent__all">
-								View all ›
-							</Link>
-						</Reveal>
-						<div className="posts__grid">
-							{recentPosts.map((post, i) => (
-								<Reveal key={post.id} delay={i * 0.08}>
-									<PostCard post={post} />
-								</Reveal>
-							))}
-						</div>
-					</div>
-				</section>
-			)}
 		</>
 	);
 }

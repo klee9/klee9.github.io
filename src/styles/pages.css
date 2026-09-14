@@ -95,7 +95,7 @@ main {
 .footer {
 	background: var(--color-bg-alt);
 	padding: var(--space-xl) 0;
-	margin-top: var(--space-3xl);
+	margin-top: var(--space-2xl);
 	font-size: 0.75rem;
 	color: var(--color-text-subtle);
 }
@@ -128,8 +128,10 @@ main {
 }
 
 /* ── Home: hero ── */
+/* Sized for a title and a line of description — no call-to-action row below,
+   so the bottom padding no longer has to clear one. */
 .hero {
-	padding: var(--space-3xl) 0 var(--space-2xl);
+	padding: var(--space-2xl) 0 var(--space-xl);
 	text-align: center;
 }
 
@@ -148,15 +150,7 @@ main {
 	letter-spacing: -0.015em;
 	color: var(--color-text-muted);
 	max-width: 36ch;
-	margin: 0 auto var(--space-xl);
-}
-
-.hero__actions {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: center;
-	align-items: center;
-	gap: var(--space-lg);
+	margin: 0 auto;
 }
 
 /* ── Home: category tiles ── */
@@ -295,8 +289,10 @@ main {
 }
 
 /* ── Post ── */
+/* The back link below already carries its own top padding, and the site footer
+   carries a top margin, so this only needs to break the two apart. */
 .post {
-	padding-bottom: var(--space-2xl);
+	padding-bottom: var(--space-lg);
 }
 
 /* The header block shares the body's column and left edge: category, title,
