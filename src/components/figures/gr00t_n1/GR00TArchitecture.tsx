@@ -112,7 +112,7 @@ const NODES: Node[] = [
 		h: 104,
 		kind: 'embodiment',
 		title: 'Action decoder',
-		body: 'An MLP head that maps processed action tokens back into the robot action space, predicting the flow-matching velocity that denoises the chunk. Embodiment-specific, like the encoders.',
+		body: 'An MLP head that maps processed action tokens back into the robot action space, predicting the flow matching velocity that denoises the chunk. Embodiment-specific, like the encoders.',
 	},
 ];
 
