@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { PageMeta } from '../layouts/BaseLayout';
 import Comments from '../components/Comments';
+import MathText, { stripMath } from '../components/math/MathText';
 import ReadingProgress from '../components/ReadingProgress';
 import { getPost, readingTime } from '../content/posts';
 import { CATEGORIES } from '../consts';
@@ -19,15 +20,19 @@ export default function Post() {
 
 	return (
 		<>
-			<PageMeta title={title} description={description} />
+			<PageMeta title={stripMath(title)} description={stripMath(description)} />
 			<ReadingProgress />
 			<article className="post" style={{ '--card-accent': categoryMeta.color } as CSSProperties}>
 				<header className="post__header container container--post">
 					<Link to={`/blog/category/${category}`} className="post__category">
 						{categoryMeta.label}
 					</Link>
-					<h1 className="post__title">{title}</h1>
-					<p className="post__description">{description}</p>
+					<h1 className="post__title">
+							<MathText text={title} />
+						</h1>
+					<p className="post__description">
+							<MathText text={description} />
+						</p>
 					<div className="post__meta">
 						<time dateTime={pubDate.toISOString()}>{formatDate(pubDate, 'long')}</time>
 						<span className="post__reading-time">{minutesRead} min read</span>

@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../consts';
+import MathText from './math/MathText';
 import { formatDate } from '../utils/date';
 import type { PostSummary } from '../content/posts';
 
@@ -22,8 +23,12 @@ export default function PostCard({ post }: PostCardProps) {
 						<span className="card__reading-time">{post.minutesRead} min</span>
 					</span>
 				</div>
-				<h2 className="card__title">{post.title}</h2>
-				<p className="card__description">{post.description}</p>
+				<h2 className="card__title">
+					<MathText text={post.title} />
+				</h2>
+				<p className="card__description">
+					<MathText text={post.description} />
+				</p>
 				{post.tags.length > 0 && (
 					<ul className="card__tags" aria-label="Tags">
 						{post.tags.map((tag) => (
