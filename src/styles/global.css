@@ -183,20 +183,24 @@ th {
 }
 
 .page-header {
-	padding: var(--space-3xl) 0 var(--space-xl);
-	text-align: center;
+	padding: var(--space-2xl) 0 var(--space-lg);
 }
 
+/* Same scale as the section headings and the home page's title, so every
+   heading on the site sits at one size. */
 .page-header__title {
+	font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	line-height: 1.1;
+	letter-spacing: -0.025em;
 	margin-bottom: var(--space-sm);
 }
 
 .page-header__description {
-	font-size: 1.3125rem;
-	line-height: 1.4;
+	font-size: 1.0625rem;
+	line-height: 1.5;
 	color: var(--color-text-muted);
-	max-width: 44ch;
-	margin: 0 auto;
+	max-width: 52ch;
+	margin: 0;
 }
 
 .text-gradient {

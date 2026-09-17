@@ -10,6 +10,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { parseFrontmatter } from '../src/content/frontmatter.mjs';
 import { stripMath } from '../src/content/strip-math.mjs';
+import { siteMeta } from './lib/site-meta.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -21,7 +22,9 @@ const SITE = {
 	description: 'Transmissions from the void — personal notes, paper reviews, and tech.',
 	url: 'https://klee9.github.io',
 };
-const CATEGORY_LABELS = { personal: 'Personal', 'paper-reviews': 'Paper Reviews', tech: 'Tech' };
+// Read from src/consts.ts rather than restated here, which is how this list
+// drifted to a 'paper-reviews' slug that has never existed.
+const CATEGORY_LABELS = (await siteMeta()).categories;
 const STATIC_PAGES = ['/', '/blog', ...Object.keys(CATEGORY_LABELS).map((c) => `/blog/category/${c}`)];
 
 const esc = (s) =>

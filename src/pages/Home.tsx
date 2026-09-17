@@ -4,7 +4,6 @@ import { PageMeta } from '../layouts/BaseLayout';
 import PostCard from '../components/PostCard';
 import Reveal from '../components/Reveal';
 import { getPublishedPosts, toPostSummary } from '../content/posts';
-import { CATEGORIES } from '../consts';
 
 export default function Home() {
 	const recentPosts = getPublishedPosts().slice(0, 3).map(toPostSummary);
@@ -21,7 +20,7 @@ export default function Home() {
 					    takes the prose treatment rather than the display sizing. */}
 					<div className="hero__intro prose rise" style={{ '--rise-delay': '0.16s' } as CSSProperties}>
 						<p>
-							I am an undergraduate student at Chung-Ang University, Korea, interested in robotics and
+							Hi, I am an undergraduate student at Chung-Ang University, Korea, interested in robotics and
 							multimodal AI.
 						</p>
 						<p>
@@ -48,37 +47,13 @@ export default function Home() {
 						<div className="posts__grid">
 							{recentPosts.map((post, i) => (
 								<Reveal key={post.id} delay={i * 0.08}>
-									<PostCard post={post} />
+									<PostCard post={post} compact />
 								</Reveal>
 							))}
 						</div>
 					</div>
 				</section>
 			)}
-
-			<section className="categories">
-				<div className="container">
-					<Reveal className="recent__header">
-						<h2 className="section-title">Categories</h2>
-					</Reveal>
-					<div className="categories__grid">
-						{Object.entries(CATEGORIES).map(([slug, meta], i) => (
-							<Reveal key={slug} delay={i * 0.08}>
-								<Link
-									to={`/blog/category/${slug}`}
-									className="category-card"
-									style={{ '--card-accent': meta.color } as CSSProperties}
-								>
-									<span className="category-card__index">0{i + 1}</span>
-									<h3 className="category-card__title">{meta.label}</h3>
-									<p className="category-card__description">{meta.description}</p>
-									<span className="category-card__link">Browse ›</span>
-								</Link>
-							</Reveal>
-						))}
-					</div>
-				</div>
-			</section>
 		</>
 	);
 }

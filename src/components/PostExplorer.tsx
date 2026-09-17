@@ -1,7 +1,7 @@
 import { useDeferredValue, useMemo, useState } from 'react';
 import { CATEGORIES, type Category } from '../consts';
 import type { PostSummary } from '../content/posts';
-import PostCard from './PostCard';
+import PostRow from './PostRow';
 
 interface PostExplorerProps {
 	posts: PostSummary[];
@@ -107,23 +107,24 @@ export default function PostExplorer({ posts, initialCategory = 'all' }: PostExp
 				</div>
 			)}
 
-			<div className="explorer__status" aria-live="polite">
-				<span>
-					{filtered.length} of {posts.length} post{posts.length === 1 ? '' : 's'}
-				</span>
-				{isFiltered && (
+			{/* A running count is noise until something is actually filtered out. */}
+			{isFiltered && (
+				<div className="explorer__status" aria-live="polite">
+					<span>
+						{filtered.length} of {posts.length} post{posts.length === 1 ? '' : 's'}
+					</span>
 					<button type="button" className="explorer__reset" onClick={reset}>
-						Clear filters
+						Clear
 					</button>
-				)}
-			</div>
+				</div>
+			)}
 
 			{filtered.length > 0 ? (
-				<div className="explorer__grid">
+				<ul className="posts-list">
 					{filtered.map((post) => (
-						<PostCard key={post.id} post={post} />
+						<PostRow key={post.id} post={post} />
 					))}
-				</div>
+				</ul>
 			) : (
 				<p className="explorer__empty">
 					No results. Try a different search or clear the filters.

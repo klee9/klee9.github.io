@@ -145,100 +145,22 @@ main {
 	margin-bottom: var(--space-lg);
 }
 
-/* Shares the page container with every other section, so its left edge lines
-   up with "Recent posts" — but the text itself keeps a readable measure
-   instead of running the container's full width. */
+/* Left edge lines up with every other section; the right edge wraps sooner,
+   because the container's full width runs past 100 characters a line. */
 .hero__intro {
-	max-width: 62ch;
-	color: var(--color-text-muted);
+	max-width: 68ch;
+	/* Between the muted tone and full body text — it is the first thing read on
+	   the site, so it should not sit as far back as secondary copy. */
+	color: color-mix(in srgb, var(--color-text) 70%, var(--color-text-muted));
 }
 
 .hero__intro p:last-child {
 	margin-bottom: 0;
 }
 
-/* ── Home: category tiles ── */
 .section-title {
 	text-align: center;
 	margin-bottom: var(--space-xl);
-}
-
-.categories {
-	padding: var(--space-2xl) 0;
-}
-
-.categories__grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: var(--space-md);
-}
-
-.category-card {
-	--card-accent: var(--color-accent);
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	min-height: 260px;
-	padding: var(--space-xl) var(--space-lg);
-	background: var(--color-bg-alt);
-	border: none;
-	border-radius: var(--radius-xl);
-	text-decoration: none;
-	color: inherit;
-	overflow: hidden;
-	transition:
-		transform var(--dur-base) var(--ease-out),
-		box-shadow var(--dur-base) var(--ease-out);
-}
-
-.category-card::after {
-	content: '';
-	position: absolute;
-	right: -30%;
-	bottom: -40%;
-	width: 80%;
-	aspect-ratio: 1;
-	border-radius: 50%;
-	background: radial-gradient(circle, color-mix(in srgb, var(--card-accent) 28%, transparent), transparent 65%);
-	transition: transform var(--dur-slow) var(--ease-out);
-}
-
-.category-card:hover {
-	transform: translateY(-4px) scale(1.01);
-	box-shadow: var(--shadow-md);
-	text-decoration: none;
-	color: inherit;
-}
-
-.category-card:hover::after {
-	transform: scale(1.25);
-}
-
-.category-card__index {
-	font-size: 0.75rem;
-	font-weight: 600;
-	color: var(--card-accent);
-}
-
-.category-card__title {
-	font-size: 1.75rem;
-	margin: var(--space-sm) 0;
-}
-
-.category-card__description {
-	font-size: 1rem;
-	color: var(--color-text-muted);
-	margin: 0 0 auto;
-	line-height: 1.4;
-}
-
-.category-card__link {
-	position: relative;
-	z-index: 1;
-	margin-top: var(--space-lg);
-	font-size: 0.9375rem;
-	font-weight: 500;
-	color: var(--color-accent);
 }
 
 /* ── Home: recent ── */
@@ -375,12 +297,10 @@ main {
 
 /* Reveal wrappers inside grids should stretch so cards fill their cell. */
 .posts__grid > .reveal,
-.explorer__grid > .reveal,
-.categories__grid > .reveal {
+.explorer__grid > .reveal {
 	display: flex;
 }
 
-.reveal > .card,
-.reveal > .category-card {
+.reveal > .card {
 	flex: 1;
 }

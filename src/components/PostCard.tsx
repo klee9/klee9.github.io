@@ -7,12 +7,18 @@ import type { PostSummary } from '../content/posts';
 
 interface PostCardProps {
 	post: PostSummary;
+	/** Drop the tag row and the "Read more" line — for the home page, where the
+	    whole card is already a link. */
+	compact?: boolean;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, compact = false }: PostCardProps) {
 	const meta = CATEGORIES[post.category];
 	return (
-		<article className="card" style={{ '--card-accent': meta.color } as CSSProperties}>
+		<article
+			className={`card${compact ? ' card--compact' : ''}`}
+			style={{ '--card-accent': meta.color } as CSSProperties}
+		>
 			<Link to={`/blog/${post.id}`} className="card__link">
 				<div className="card__top">
 					<span className="card__category">{meta.label}</span>
@@ -29,7 +35,7 @@ export default function PostCard({ post }: PostCardProps) {
 				<p className="card__description">
 					<MathText text={post.description} />
 				</p>
-				{post.tags.length > 0 && (
+				{!compact && post.tags.length > 0 && (
 					<ul className="card__tags" aria-label="Tags">
 						{post.tags.map((tag) => (
 							<li key={tag} className="card__tag">
@@ -38,9 +44,11 @@ export default function PostCard({ post }: PostCardProps) {
 						))}
 					</ul>
 				)}
-				<span className="card__read">
-					Read more <span aria-hidden="true">›</span>
-				</span>
+				{!compact && (
+					<span className="card__read">
+						Read more <span aria-hidden="true">›</span>
+					</span>
+				)}
 			</Link>
 		</article>
 	);

@@ -8,10 +8,7 @@ export default function Blog() {
 		<>
 			<PageMeta title="Blog" description="All posts — personal writing, paper reviews, and tech notes." />
 			<div className="page-header container">
-				<h1 className="page-header__title">Blog</h1>
-				<p className="page-header__description">
-					Personal writing, paper reviews, and tech notes.
-				</p>
+				<h1 className="page-header__title">All posts</h1>
 			</div>
 			<section className="posts container">
 				<PostExplorer posts={posts} />
