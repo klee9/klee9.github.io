@@ -9,6 +9,7 @@ import { readdir, readFile, writeFile, copyFile, mkdir } from 'node:fs/promises'
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { parseFrontmatter } from '../src/content/frontmatter.mjs';
+import { stripMath } from '../src/content/strip-math.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
@@ -34,15 +35,15 @@ async function loadPosts() {
 		if (data.draft) continue;
 		posts.push({
 			id: file.replace(/\.mdx?$/, ''),
-			title: data.title,
-			description: data.description,
+			title: stripMath(data.title),
+			description: stripMath(data.description),
 			pubDate: new Date(data.pubDate),
 			updatedDate: data.updatedDate ? new Date(data.updatedDate) : undefined,
 			category: data.category,
 			tags: Array.isArray(data.tags) ? data.tags : [],
 		});
 	}
-	return posts.sort((a, b) => b.pubDate - a.pubDate);
+	return posts.sort((a, b) => b.pubDate - a.pubDate || a.id.localeCompare(b.id));
 }
 
 function rss(posts) {
