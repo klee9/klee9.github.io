@@ -160,10 +160,68 @@
 	-webkit-appearance: none;
 }
 
+/* Search and its tag toggle read as one control. */
+.explorer__search-group {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-sm);
+}
+
 .explorer__filters {
+	position: relative;
 	display: inline-flex;
 	flex-wrap: wrap;
 	gap: var(--space-md);
+}
+
+/* One underline for the whole group, slid into place under the active button. */
+.explorer__underline {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	height: 1px;
+	background: var(--color-text-bright);
+	transition:
+		transform var(--dur-base) var(--ease-spring),
+		width var(--dur-base) var(--ease-spring);
+	pointer-events: none;
+}
+
+/* Opens the tag row. Icon-only at rest; carries a count when tags are applied
+   but the row is folded away, so an active filter is never invisible. */
+.tag-toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3em;
+	padding: 0.2em 0;
+	border: none;
+	background: none;
+	font: inherit;
+	font-size: 0.875rem;
+	color: var(--color-text-subtle);
+	cursor: pointer;
+	border-radius: 4px;
+	transition: color var(--dur-fast) var(--ease-out);
+}
+
+.tag-toggle:hover,
+.tag-toggle.is-open {
+	color: var(--color-text-bright);
+}
+
+.tag-toggle__count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.15em;
+	height: 1.15em;
+	padding: 0 0.3em;
+	border-radius: var(--radius-pill);
+	background: var(--color-accent);
+	color: var(--color-on-accent);
+	font-size: 0.6875rem;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
 }
 
 .filter {
@@ -172,13 +230,10 @@
 	font-weight: 500;
 	padding: 0.2em 0;
 	border: none;
-	border-bottom: 1px solid transparent;
 	background: transparent;
 	color: var(--color-text-subtle);
 	cursor: pointer;
-	transition:
-		color var(--dur-fast) var(--ease-out),
-		border-color var(--dur-fast) var(--ease-out);
+	transition: color var(--dur-fast) var(--ease-out);
 }
 
 .filter:hover {
@@ -188,14 +243,50 @@
 .filter--active,
 .filter--active:hover {
 	color: var(--color-text-bright);
-	border-bottom-color: var(--color-text-bright);
+}
+
+/* The 0fr → 1fr grid row is what lets a height of `auto` animate. The panel
+   stays mounted so there is something to animate; `inert` keeps its buttons out
+   of the tab order while it is closed. */
+.explorer__tags-wrap {
+	display: grid;
+	grid-template-rows: 0fr;
+	opacity: 0;
+	transition:
+		grid-template-rows var(--dur-base) var(--ease-out),
+		opacity var(--dur-base) var(--ease-out);
+}
+
+.explorer__tags-wrap.is-open {
+	grid-template-rows: 1fr;
+	opacity: 1;
 }
 
 .explorer__tags {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--space-md);
-	margin-bottom: var(--space-xl);
+	min-height: 0;
+	overflow: hidden;
+	/* Padding has to animate too — a 0fr row still reserves the child's padding,
+	   which would leave the closed panel holding open a strip of empty space. */
+	padding: 0;
+	transition: padding var(--dur-base) var(--ease-out);
+}
+
+.explorer__tags-wrap.is-open .explorer__tags {
+	padding: var(--space-md) 0 var(--space-lg);
+}
+
+@keyframes tags-in {
+	from {
+		opacity: 0;
+		transform: translateY(-4px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
 }
 
 .tag {
@@ -1608,4 +1699,60 @@
 		align-items: baseline;
 		gap: var(--space-sm);
 	}
+}
+
+/* ── Press feedback: every control dips slightly, like .btn already does ── */
+.filter,
+.tag,
+.tag-toggle,
+.explorer__reset {
+	transition:
+		color var(--dur-fast) var(--ease-out),
+		border-color var(--dur-fast) var(--ease-out),
+		opacity var(--dur-fast) var(--ease-out),
+		transform var(--dur-fast) var(--ease-spring);
+}
+
+.filter:active,
+.tag:not(:disabled):active,
+.tag-toggle:active,
+.explorer__reset:active {
+	transform: scale(0.94);
+}
+
+/* The badge pops in rather than blinking on. */
+.tag-toggle__count {
+	animation: badge-in var(--dur-base) var(--ease-spring) both;
+}
+
+@keyframes badge-in {
+	from {
+		opacity: 0;
+		transform: scale(0.4);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+/* ── The list re-enters when a filter button changes the result set ── */
+.row {
+	animation: row-in var(--dur-base) var(--ease-out) both;
+	animation-delay: calc(var(--row-i, 0) * 30ms);
+}
+
+@keyframes row-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.explorer__status {
+	animation: tags-in var(--dur-fast) var(--ease-out) both;
 }

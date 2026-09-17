@@ -13,10 +13,14 @@ import type { PostSummary } from '../content/posts';
  * titles down a single column — and because rows keep working at fifty posts,
  * where a wall of cards stops being scannable.
  */
-export default function PostRow({ post }: { post: PostSummary }) {
+export default function PostRow({ post, index = 0 }: { post: PostSummary; index?: number }) {
 	const meta = CATEGORIES[post.category];
 	return (
-		<li className="row" style={{ '--card-accent': meta.color } as CSSProperties}>
+		<li
+			className="row"
+			/* `--row-i` staggers the entrance when the filtered set changes. */
+			style={{ '--card-accent': meta.color, '--row-i': index } as CSSProperties}
+		>
 			<Link to={`/blog/${post.id}`} className="row__link">
 				<div className="row__main">
 					<h2 className="row__title">

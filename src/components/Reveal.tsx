@@ -35,7 +35,9 @@ export default function Reveal({ children, as: Tag = 'div', className = '', dela
 					}
 				}
 			},
-			{ rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
+			// Fire a little *before* the element reaches the viewport, so the fade is
+			// already underway by the time it is on screen rather than starting then.
+			{ rootMargin: '0px 0px 15% 0px', threshold: 0 },
 		);
 		observer.observe(el);
 		return () => observer.disconnect();

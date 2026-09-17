@@ -46,7 +46,7 @@ export default function Home() {
 						</Reveal>
 						<div className="posts__grid">
 							{recentPosts.map((post, i) => (
-								<Reveal key={post.id} delay={i * 0.08}>
+								<Reveal key={post.id} delay={i * 0.03}>
 									<PostCard post={post} compact />
 								</Reveal>
 							))}
