@@ -130,27 +130,31 @@ main {
 /* ── Home: hero ── */
 /* Sized for a title and a line of description — no call-to-action row below,
    so the bottom padding no longer has to clear one. */
+/* The landing page is also the introduction, so it reads as a column of text
+   rather than a centred title card. */
 .hero {
 	padding: var(--space-2xl) 0 var(--space-xl);
-	text-align: center;
 }
 
-.hero__inner {
-	max-width: 780px;
-}
-
+/* Sized as a section heading, matching "Recent posts" and "Categories" — it
+   stays an <h1> because the page still needs exactly one. */
 .hero__title {
-	font-size: clamp(3rem, 8vw, 5.5rem);
-	margin-bottom: var(--space-md);
+	font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+	line-height: 1.1;
+	letter-spacing: -0.025em;
+	margin-bottom: var(--space-lg);
 }
 
-.hero__description {
-	font-size: clamp(1.25rem, 2.2vw, 1.75rem);
-	line-height: 1.3;
-	letter-spacing: -0.015em;
+/* Shares the page container with every other section, so its left edge lines
+   up with "Recent posts" — but the text itself keeps a readable measure
+   instead of running the container's full width. */
+.hero__intro {
+	max-width: 62ch;
 	color: var(--color-text-muted);
-	max-width: 36ch;
-	margin: 0 auto;
+}
+
+.hero__intro p:last-child {
+	margin-bottom: 0;
 }
 
 /* ── Home: category tiles ── */
@@ -274,10 +278,6 @@ main {
 }
 
 /* ── About ── */
-.about {
-	padding-bottom: var(--space-2xl);
-}
-
 /* ── Post ── */
 /* The back link below already carries its own top padding, and the site footer
    carries a top margin, so this only needs to break the two apart. */

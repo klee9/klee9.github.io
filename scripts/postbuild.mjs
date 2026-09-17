@@ -22,7 +22,7 @@ const SITE = {
 	url: 'https://klee9.github.io',
 };
 const CATEGORY_LABELS = { personal: 'Personal', 'paper-reviews': 'Paper Reviews', tech: 'Tech' };
-const STATIC_PAGES = ['/', '/blog', '/about', ...Object.keys(CATEGORY_LABELS).map((c) => `/blog/category/${c}`)];
+const STATIC_PAGES = ['/', '/blog', ...Object.keys(CATEGORY_LABELS).map((c) => `/blog/category/${c}`)];
 
 const esc = (s) =>
 	String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

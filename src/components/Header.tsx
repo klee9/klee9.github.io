@@ -1,8 +1,6 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { SITE } from '../consts';
 import ThemeToggle from './ThemeToggle';
-
-const navLinks = [{ href: '/about', label: 'About' }];
 
 export default function Header() {
 	return (
@@ -13,15 +11,6 @@ export default function Header() {
 					<span className="header__name">{SITE.title}</span>
 				</Link>
 				<nav className="header__nav" aria-label="Main navigation">
-					{navLinks.map(({ href, label }) => (
-						<NavLink
-							key={href}
-							to={href}
-							className={({ isActive }) => `header__link${isActive ? ' header__link--active' : ''}`}
-						>
-							{label}
-						</NavLink>
-					))}
 					<a
 						href={SITE.github}
 						className="header__link header__link--icon"

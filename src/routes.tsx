@@ -3,7 +3,6 @@ import { CATEGORY_SLUGS } from './consts';
 import { getPublishedPosts } from './content/posts';
 import BaseLayout from './layouts/BaseLayout';
 import Home from './pages/Home';
-import About from './pages/About';
 import Blog from './pages/Blog';
 import Category from './pages/Category';
 import Post from './pages/Post';
@@ -19,7 +18,6 @@ export const routes: RouteRecord[] = [
 		Component: BaseLayout,
 		children: [
 			{ index: true, Component: Home },
-			{ path: 'about', Component: About },
 			{ path: 'blog', Component: Blog },
 			{
 				path: 'blog/category/:category',

@@ -4,7 +4,7 @@ import { PageMeta } from '../layouts/BaseLayout';
 import PostCard from '../components/PostCard';
 import Reveal from '../components/Reveal';
 import { getPublishedPosts, toPostSummary } from '../content/posts';
-import { SITE, CATEGORIES } from '../consts';
+import { CATEGORIES } from '../consts';
 
 export default function Home() {
 	const recentPosts = getPublishedPosts().slice(0, 3).map(toPostSummary);
@@ -15,12 +15,24 @@ export default function Home() {
 			<section className="hero">
 				<div className="hero__inner container">
 					<h1 className="hero__title rise" style={{ '--rise-delay': '0.08s' } as CSSProperties}>
-						Writing on <span className="text-gradient">life</span>, <span className="text-gradient">papers</span>, and{' '}
-						<span className="text-gradient">code</span>.
+						About me
 					</h1>
-					<p className="hero__description rise" style={{ '--rise-delay': '0.16s' } as CSSProperties}>
-						{SITE.description}
-					</p>
+					{/* The introduction that used to live on /about. Body copy, so it
+					    takes the prose treatment rather than the display sizing. */}
+					<div className="hero__intro prose rise" style={{ '--rise-delay': '0.16s' } as CSSProperties}>
+						<p>
+							I am an undergraduate student at Chung-Ang University, Korea, interested in robotics and
+							multimodal AI.
+						</p>
+						<p>
+							This is where I document my journey through research &mdash; including paper reviews,
+							implementation notes, experiments, and ideas that I find interesting.
+						</p>
+						<p>
+							I hope these notes can be useful to others exploring similar topics, and serve as a record of
+							what I have learned along the way.
+						</p>
+					</div>
 				</div>
 			</section>
 
