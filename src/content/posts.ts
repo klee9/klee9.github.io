@@ -102,7 +102,9 @@ export function toPostSummary(post: Post): PostSummary {
 }
 
 export function sortPostsByDate(posts: Post[]): Post[] {
-	return [...posts].sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+	return [...posts].sort(
+		(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf() || a.id.localeCompare(b.id),
+	);
 }
 
 const isPublished = (p: Post) => !p.data.draft || import.meta.env.DEV; // drafts show in dev only

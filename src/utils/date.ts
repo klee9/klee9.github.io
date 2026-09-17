@@ -1,3 +1,5 @@
+import { SITE } from '../consts';
+
 type DateFormat = 'short' | 'long';
 
 const formatters: Record<DateFormat, Intl.DateTimeFormatOptions> = {
@@ -7,5 +9,7 @@ const formatters: Record<DateFormat, Intl.DateTimeFormatOptions> = {
 
 export function formatDate(date: Date | string, format: DateFormat = 'short'): string {
 	const d = typeof date === 'string' ? new Date(date) : date;
-	return d.toLocaleDateString('en-US', { ...formatters[format], timeZone: 'UTC' });
+	// A fixed zone, not the visitor's: the pre-rendered HTML and the hydrated
+	// page have to agree, and the post's own date shouldn't move per reader.
+	return d.toLocaleDateString('en-US', { ...formatters[format], timeZone: SITE.timeZone });
 }

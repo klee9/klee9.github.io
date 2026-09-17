@@ -3,6 +3,9 @@ export const SITE = {
 	tagline: '',
 	description: 'Personal notes, paper reviews, and tech.',
 	url: 'https://klee9.github.io',
+	/* Dates are formatted in this zone everywhere, so a post written late at
+	   night keeps its local date instead of slipping back a day under UTC. */
+	timeZone: 'Asia/Seoul',
 	author: 'Keon Lee',
 	github: 'https://github.com/klee9',
 } as const;
