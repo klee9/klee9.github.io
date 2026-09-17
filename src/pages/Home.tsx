@@ -14,7 +14,6 @@ export default function Home() {
 			<PageMeta />
 			<section className="hero">
 				<div className="hero__inner container">
-					{SITE.tagline && <p className="eyebrow rise">{SITE.tagline}</p>}
 					<h1 className="hero__title rise" style={{ '--rise-delay': '0.08s' } as CSSProperties}>
 						Writing on <span className="text-gradient">life</span>, <span className="text-gradient">papers</span>, and{' '}
 						<span className="text-gradient">code</span>.

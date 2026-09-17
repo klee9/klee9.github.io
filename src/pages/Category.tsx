@@ -18,9 +18,6 @@ export default function Category() {
 				<Link to="/blog" className="back">
 					‹ All posts
 				</Link>
-				<p className="eyebrow" style={{ color: meta.color }}>
-					Category
-				</p>
 				<h1 className="page-header__title">{meta.label}</h1>
 				<p className="page-header__description">{meta.description}</p>
 			</div>

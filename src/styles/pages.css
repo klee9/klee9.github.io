@@ -278,16 +278,6 @@ main {
 	padding-bottom: var(--space-2xl);
 }
 
-.about__content {
-	padding: var(--space-xl);
-	font-size: 1.0625rem;
-}
-
-.about__content h2 {
-	font-size: 1.5rem;
-	margin-top: var(--space-lg);
-}
-
 /* ── Post ── */
 /* The back link below already carries its own top padding, and the site footer
    carries a top margin, so this only needs to break the two apart. */

@@ -199,14 +199,6 @@ th {
 	margin: 0 auto;
 }
 
-.eyebrow {
-	font-size: 0.8125rem;
-	font-weight: 600;
-	letter-spacing: 0.02em;
-	color: var(--color-accent);
-	margin: 0 0 var(--space-sm);
-}
-
 .text-gradient {
 	background: linear-gradient(90deg, #0071e3, #af52de, #ff2d55);
 	-webkit-background-clip: text;
