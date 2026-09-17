@@ -18,7 +18,7 @@
 
 	/* ── Surfaces ── */
 	--color-bg: #ffffff;
-	--color-bg-alt: #f5f5f7; /* the soft gray band apple.com uses between sections */
+	--color-bg-alt: #f7f7f7;
 	--color-bg-elevated: #ffffff;
 	--color-bg-subtle: rgba(0, 0, 0, 0.04);
 	--color-border: rgba(0, 0, 0, 0.08);
@@ -82,18 +82,23 @@
 :root[data-theme='dark'] {
 	color-scheme: dark;
 
-	--color-bg: #000000;
-	--color-bg-alt: #161617;
-	--color-bg-elevated: #1d1d1f;
+	/* Not pure black: a near-black page throws maximum contrast at the reader and
+	   is tiring over a long post. Every other surface steps up from here, so
+	   cards and the footer still read as raised. */
+	--color-bg: #1b1b1b;
+	--color-bg-alt: #222222;
+	--color-bg-elevated: #2a2a2a;
 	--color-bg-subtle: rgba(255, 255, 255, 0.06);
 	--color-border: rgba(255, 255, 255, 0.1);
 	--color-border-strong: rgba(255, 255, 255, 0.2);
-	--color-nav: rgba(0, 0, 0, 0.72);
+	--color-nav: rgba(27, 27, 27, 0.72);
 
 	--color-text: #f5f5f7;
 	--color-text-bright: #ffffff;
 	--color-text-muted: #a1a1a6;
-	--color-text-subtle: #86868b;
+	/* Lightened from #86868b, which fell under the 4.5:1 small text needs once
+	   card surfaces stopped being near-black. This clears it on every surface. */
+	--color-text-subtle: #98989d;
 
 	--color-accent: #2997ff;
 	--color-accent-hover: #3aa2ff;
