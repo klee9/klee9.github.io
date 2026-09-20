@@ -80,6 +80,17 @@ export default function Term({ note, children }: { note: string; children: React
 		setOpen((o) => !o);
 	};
 
+	/**
+	 * Place it once on mount and on every resize, not just when it opens: a
+	 * hidden bubble is still laid out, so an unclamped one hanging past the right
+	 * edge drags the whole page into horizontal scroll on a phone.
+	 */
+	useEffect(() => {
+		place();
+		window.addEventListener('resize', place);
+		return () => window.removeEventListener('resize', place);
+	}, [place]);
+
 	// While pinned open, a tap anywhere else or Escape dismisses it, and the
 	// bubble re-places itself if the viewport moves under it.
 	useEffect(() => {
