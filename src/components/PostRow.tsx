@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../consts';
 import MathText from './math/MathText';
+import ViewCount from './ViewCount';
 import { formatDate } from '../utils/date';
 import type { PostSummary } from '../content/posts';
 
@@ -34,7 +35,7 @@ export default function PostRow({ post, index = 0 }: { post: PostSummary; index?
 					<span className="row__category">{meta.label}</span>
 					<span className="row__dates">
 						<time dateTime={post.pubDate}>{formatDate(post.pubDate)}</time>
-						<span className="row__reading-time">{post.minutesRead} min</span>
+						<ViewCount path={`/blog/${post.id}`} className="row__views" />
 					</span>
 				</div>
 			</Link>

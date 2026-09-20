@@ -1,3 +1,5 @@
+import { canonicalPath } from './views';
+
 /**
  * Thin wrapper over the analytics scripts so components can report
  * interactions without knowing which service is loaded.
@@ -40,8 +42,9 @@ export function track(name: string, title?: string): void {
  * the initial page load themselves; React Router navigations don't reload the
  * page, so BaseLayout calls this whenever the pathname changes.
  */
-export function pageview(path: string): void {
+export function pageview(rawPath: string): void {
 	if (typeof window === 'undefined') return;
+	const path = canonicalPath(rawPath);
 	try {
 		window.gtag?.('event', 'page_view', { page_path: path, page_title: document.title });
 	} catch {

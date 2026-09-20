@@ -246,7 +246,7 @@ main {
 	color: var(--color-text-subtle);
 }
 
-.post__reading-time::before,
+.post__views::before,
 .post__updated::before {
 	content: '·';
 	margin-right: var(--space-md);

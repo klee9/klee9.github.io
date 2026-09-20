@@ -22,8 +22,8 @@ export const SITE = {
  * - GoatCounter (free, cookie-free, no banner): https://www.goatcounter.com.
  */
 export const ANALYTICS = {
-	gaMeasurementId: '', // e.g. 'G-X3KVSNJ43V'
-	goatcounterCode: 'klee9', // → https://klee9.goatcounter.com
+	gaMeasurementId: 'G-88CVETYFT9',
+	goatcounterCode: 'klee9',
 } as const;
 
 /**

@@ -55,7 +55,7 @@
 	color: var(--color-text-subtle);
 }
 
-.card__reading-time::before {
+.card__views::before {
 	content: '·';
 	margin-right: var(--space-sm);
 }
@@ -1441,7 +1441,10 @@
 
 .mix__value {
 	flex-grow: 0;
-	flex-shrink: 0;
+	/* The gaps between segments are not in the basis, so let the labels give a
+	   couple of pixels back rather than overflow the figure. */
+	flex-shrink: 1;
+	min-width: 0;
 	text-align: center;
 	font-size: 0.75rem;
 	font-weight: 600;
@@ -1682,7 +1685,7 @@
 	font-variant-numeric: tabular-nums;
 }
 
-.row__reading-time::before {
+.row__views::before {
 	content: '·';
 	margin: 0 0.4em;
 }
@@ -1755,4 +1758,21 @@
 
 .explorer__status {
 	animation: tags-in var(--dur-fast) var(--ease-out) both;
+}
+
+/* View counts arrive after hydration; fade them in rather than popping. */
+.card__views,
+.row__views,
+.post__views {
+	font-variant-numeric: tabular-nums;
+	animation: views-in var(--dur-base) var(--ease-out) both;
+}
+
+@keyframes views-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }

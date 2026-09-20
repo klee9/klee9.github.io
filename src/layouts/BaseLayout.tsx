@@ -42,6 +42,12 @@ export default function BaseLayout() {
 				{gaId && (
 					<script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${gaId}');`}</script>
 				)}
+				{/* Must run before count.js: strips the trailing slash GitHub Pages adds
+				    to /blog/x/, so the first load and later client-side navigations
+				    count toward one path, which is also what the view counter reads. */}
+				{goatcounterEndpoint && (
+					<script>{`window.goatcounter={path:function(p){return p.length>1?p.replace(/\\/+$/,''):p}}`}</script>
+				)}
 				{goatcounterEndpoint && (
 					<script data-goatcounter={goatcounterEndpoint} async src="//gc.zgo.at/count.js" />
 				)}

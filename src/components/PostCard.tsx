@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { CATEGORIES } from '../consts';
 import MathText from './math/MathText';
+import ViewCount from './ViewCount';
 import { formatDate } from '../utils/date';
 import type { PostSummary } from '../content/posts';
 
@@ -26,7 +27,7 @@ export default function PostCard({ post, compact = false }: PostCardProps) {
 						<time className="card__date" dateTime={post.pubDate}>
 							{formatDate(post.pubDate)}
 						</time>
-						<span className="card__reading-time">{post.minutesRead} min</span>
+						<ViewCount path={`/blog/${post.id}`} className="card__views" />
 					</span>
 				</div>
 				<h2 className="card__title">

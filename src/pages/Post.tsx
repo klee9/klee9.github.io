@@ -4,7 +4,8 @@ import { PageMeta } from '../layouts/BaseLayout';
 import Comments from '../components/Comments';
 import MathText, { stripMath } from '../components/math/MathText';
 import ReadingProgress from '../components/ReadingProgress';
-import { getPost, readingTime } from '../content/posts';
+import { getPost } from '../content/posts';
+import ViewCount from '../components/ViewCount';
 import { CATEGORIES } from '../consts';
 import { formatDate } from '../utils/date';
 
@@ -15,7 +16,6 @@ export default function Post() {
 
 	const { title, description, pubDate, updatedDate, category, tags } = post.data;
 	const categoryMeta = CATEGORIES[category];
-	const minutesRead = readingTime(post.body);
 	const Content = post.Component;
 
 	return (
@@ -35,7 +35,7 @@ export default function Post() {
 						</p>
 					<div className="post__meta">
 						<time dateTime={pubDate.toISOString()}>{formatDate(pubDate, 'long')}</time>
-						<span className="post__reading-time">{minutesRead} min read</span>
+						<ViewCount path={`/blog/${post.id}`} className="post__views" />
 						{updatedDate && (
 							<span className="post__updated">
 								Updated <time dateTime={updatedDate.toISOString()}>{formatDate(updatedDate, 'long')}</time>
