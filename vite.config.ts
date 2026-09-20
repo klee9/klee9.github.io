@@ -7,8 +7,46 @@ import remarkFrontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeShiki from '@shikijs/rehype';
 
 const POSTS_DIR = fileURLToPath(new URL('./src/content/blog', import.meta.url));
+
+/**
+ * Wraps every post table in a horizontally scrollable container.
+ *
+ * A table cannot shrink below the widest word in its cells, so on a phone a
+ * data table pushes past the column and takes the whole page into horizontal
+ * scroll with it. Giving it its own scroll box confines that to the table.
+ *
+ * A rehype plugin rather than CSS, because `display: block` on a <table> — the
+ * usual CSS-only workaround — throws away real table layout and with it the
+ * column sizing. Hand-written so it costs no dependency.
+ */
+function rehypeScrollableTables() {
+	/** @param {any} node */
+	return (tree: any) => {
+		const walk = (node: any) => {
+			if (!node?.children) return;
+			node.children = node.children.map((child: any) => {
+				walk(child);
+				if (child.type !== 'element' || child.tagName !== 'table') return child;
+				return {
+					type: 'element',
+					tagName: 'div',
+					properties: {
+						className: ['table-scroll'],
+						// A scrollable region needs to be reachable without a mouse.
+						tabIndex: 0,
+						role: 'region',
+						'aria-label': 'Table',
+					},
+					children: [child],
+				};
+			});
+		};
+		walk(tree);
+	};
+}
 
 /**
  * Appends each post's original text to its own compiled module as
@@ -50,7 +88,19 @@ export default defineConfig({
 					remarkGfm, // tables, strikethrough, task lists, autolinks — not in core CommonMark
 					remarkMath, // $...$ and $$...$$
 				],
-				rehypePlugins: [rehypeKatex], // → KaTeX HTML at build time
+				rehypePlugins: [
+					[
+						rehypeShiki,
+						{
+							// Both themes are emitted as CSS custom properties on every token,
+							// so the theme switch is a CSS swap rather than a re-highlight.
+							themes: { light: 'github-light', dark: 'github-dark-dimmed' },
+							defaultColor: false,
+						},
+					],
+					rehypeKatex, // → KaTeX HTML at build time
+					rehypeScrollableTables,
+				],
 			}),
 		},
 		react({ include: /\.(mdx?|[jt]sx?)$/ }),

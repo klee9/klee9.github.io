@@ -122,6 +122,34 @@ pre code {
 	font-size: inherit;
 }
 
+/* ── Syntax highlighting (Shiki, at build time) ──
+   Shiki writes both themes onto every token as custom properties, so switching
+   theme is a CSS swap — no second highlight pass, no runtime JS, and code still
+   has colour in the pre-rendered HTML before hydration. */
+.shiki,
+.shiki span {
+	color: var(--shiki-light);
+	background-color: var(--shiki-light-bg);
+}
+
+:root[data-theme='dark'] .shiki,
+:root[data-theme='dark'] .shiki span {
+	color: var(--shiki-dark);
+	background-color: var(--shiki-dark-bg);
+}
+
+/* Shiki marks the block scrollable and focusable; keep the site's own frame. */
+pre.shiki {
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	padding: var(--space-md) var(--space-lg);
+}
+
+pre.shiki:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
 blockquote {
 	margin: var(--space-lg) 0;
 	padding: var(--space-sm) var(--space-lg);
@@ -162,6 +190,33 @@ td {
 th {
 	font-weight: 600;
 	color: var(--color-text-bright);
+}
+
+/* Tables scroll inside their own box instead of widening the page. */
+.table-scroll {
+	overflow-x: auto;
+	margin: var(--space-lg) 0;
+	outline: none;
+}
+
+.table-scroll:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+	border-radius: var(--radius-sm);
+}
+
+.table-scroll table {
+	margin: 0;
+	/* Fills the column when the content is narrow, and overflows into the
+	   scroll box — rather than the page — when it is not. */
+	width: max-content;
+	min-width: 100%;
+}
+
+/* Numbers and short labels read better swiped than wrapped two words a line. */
+.table-scroll th,
+.table-scroll td {
+	white-space: nowrap;
 }
 
 /* ── Layout helpers ── */
