@@ -44,7 +44,7 @@ The language models of VLAs are typically transformer decoders. Although these a
 updates its input hidden state $\mathbf{x}^{(\ell)} \in \mathbb{R}^{d \times S}$ via residual transformation $\mathbf{x}^{(\ell + 1)} = \mathbf{x}^{(\ell)} + f(\mathbf{x}^{(\ell)}, \theta^{(\ell)})$ 
 ($d$: hidden dimension, $S$: sequence length, $\theta$: parameters)
 
-However, the cosine similarity between the input $\mathbf{x}^{(\ell)}$ and output $\mathbf{x}^{(\ell + 1)}$ states for some layers are high, meaning that the transformation $f$ is redundant in those layers. To decide
+However, the cosine similarities between the input $\mathbf{x}^{(\ell)}$ and output $\mathbf{x}^{(\ell + 1)}$ states for some layers are high, meaning that the transformation $f$ is redundant in those layers. To decide
 which layers are subject to pruning, the importance of each layer is quantified as:
 
 $$
