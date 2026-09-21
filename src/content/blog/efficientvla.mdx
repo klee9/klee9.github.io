@@ -74,7 +74,7 @@ $$
 Here, $A^{(h)}_{i, j}$ means the attention score from visual token $v_i$ to the $j$-th contextual token in the $h$-th attention head. In other words, this equation computes the sum of attention scores 
 between a visual token $v_i$ and task-relevant contextual tokens averaged over all attention heads. 
 
-The relevance scores are normalized to $s_i \in [0, 1]$ for robust comparison and future token selection. Then, a part visual tokens to keep are defined as:
+The relevance scores are normalized to $s_i \in [0, 1]$ for robust comparison and future token selection. Then, a part of visual tokens to keep are defined as:
 
 $$
 V_{\text{key}} = \left[ v_i \in V | s_i \text{ is among the top } K_{\text{key}} \text{ scores in } \{s_k\}^{N_{\text{total}}}_{k=1}\right] (4 \lt K_{\text{key}} \lt 8)
