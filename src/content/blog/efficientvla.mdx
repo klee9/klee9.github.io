@@ -1,0 +1,219 @@
+---
+title: 'EfficientVLA'
+description: 'Training-Free Acceleration and Compression for Vision-Language-Action Models'
+pubDate: 2026-09-20
+category: paper
+tags: ['VLA', 'robotics', 'VLA Compression']
+---
+
+import Redundancy from '../../components/figures/efficientvla/Redundancy';
+import Architecture from '../../components/figures/efficientvla/Architecture';
+import DataTable from '../../components/DataTable';
+
+## Problems with existing VLAs
+
+VLAs (especially the diffusion-based ones) show a potential for embodied intelligence. Despite their success, they pose significant computational and memory overheads during inference. 
+This limits their deployability particularly for real-time interaction on resource-constrained robotic platforms.
+
+Of course, there have been efforts to address this bottleneck, but they largely focus on isolated tweaks:
+
+<DataTable
+	columns={[
+		{ label: 'Method' },
+		{ label: 'How it accelerates VLA', wrap: true },
+		{ label: 'Limitation', wrap: true },
+	]}
+	rows={[
+		['TinyVLA', 'Uses a specialized lightweight VLA architecture designed to reduce computational cost.', 'Efficiency comes from designing a smaller/faster model rather than accelerating arbitrary pretrained VLAs.'],
+		['DeeR-VLA', 'Uses a specialized architecture/inference design to make VLA execution more efficient.', 'Tied to its particular model architecture rather than being a general acceleration method for existing pretrained VLAs.'],
+		['Mole-VLA', 'Targets redundant LLM layers and removes/reduces unnecessary computation from them.', 'Requires retraining and mainly addresses the LLM portion rather than the entire VLA pipeline.'],
+		['VLA-Cache', 'Caches visual tokens that remain unchanged across consecutive inference steps, avoiding repeated computation.', 'Speedup is limited by the LLM\'s large memory footprint and the computational cost of the action head.'],
+	]}
+/>
+
+These methods overlook the integrated nature of VLAs, and offer fragmented solutions, where gains are limited by unaddressed inefficiencies elsewhere. 
+So instead of optimizing one component in isolation, something that can penetrate the entire pipeline is needed.
+
+
+## Making VLAs lighter & faster
+
+<Redundancy />
+
+### VLM pruning
+The language models of VLAs are typically transformer decoders. Although these are critical for multimodal reasoning, they often introduce a large computational overhead as each layer $\ell$ of the decoder 
+updates its input hidden state $\mathbf{x}^{(\ell)} \in \mathbb{R}^{d \times S}$ via residual transformation $\mathbf{x}^{(\ell + 1)} = \mathbf{x}^{(\ell)} + f(\mathbf{x}^{(\ell)}, \theta^{(\ell)})$ 
+($d$: hidden dimension, $S$: sequence length, $\theta$: parameters)
+
+However, the cosine similarity between the input $\mathbf{x}^{(\ell)}$ and output $\mathbf{x}^{(\ell + 1)}$ states for some layers are high, meaning that the transformation $f$ is redundant in those layers. To decide
+which layers are subject to pruning, the importance of each layer is quantified as:
+
+$$
+I^{(\ell)} = 1 - \frac{1}{|\mathcal{D}|} \sum_{i=1}^{|\mathcal{D}|} \left( \frac{1}{L} \sum_{j=1}^{L} \frac{x^{(\ell)}_{i, j} \cdot x^{(\ell + 1)}_{i, j}}{\| x^{(\ell)}_{i, j} \|_2 \| x^{(\ell+1)}_{i, j} \|_2} \right)
+$$
+
+where $\mathcal{D}$ is the dataset, $L$ is the token position within a sample, $x^{(\ell)}_{i, j}$, $x^{(\ell + 1)}_{i, j} \in \mathbb{R}^{d}$ are 
+input and output hidden state vectors, respectively, at position $j$ of sample $i$ for layer $\ell$. 
+
+The equation is simply one minus the average cosine similarity of a layer $\ell$, so the higher the cosine similarity between the input and output hidden state vectors, 
+the closer the importance score is to 0, and vice versa.
+
+The importance score is computed for all layers, then these scores are ranked, yielding $\mathcal{L}_{\text{ranked}} = \left[ \ell_{(0)}, \ell_{(1)}, \cdots, \ell{(N)} \right]$. The first $n$ layers are pruned from the language model.
+
+
+### Visual token pruning
+Visual tokens contain rich information. Yes, this is good, but they come along with redundancy, causing computational and memeory overhead. They come in two forms: tokens with low task relevance, and tokens that contain
+duplicate information due to inherent visual similarities within the input.
+
+Then how can task relevance be defined? For all visual tokens $v_i$, the attention from $v_i$ towards $L_{ctx}$ task-defining contextual embeddings, such as language instruction, is captured via cross-attention between $v_i$ and selected VLM layers.
+The task relevance score $r_i$ is defined using this information:
+
+$$
+r_i = \sum_{j}^{L_{ctx}} \left( \frac{1}{H} \sum_{h=1}^{H} A^{(h)}_{i, j} \right)
+$$
+
+Here, $A^{(h)}_{i, j}$ means the attention score from visual token $v_i$ to the $j$-th contextual token in the $h$-th attention head. In other words, this equation computes the sum of attention scores 
+between a visual token $v_i$ and task-relevant contextual tokens averaged over all attention heads. 
+
+The relevance scores are normalized to $s_i \in [0, 1]$ for robust comparison and future token selection. Then, a part visual tokens to keep are defined as:
+
+$$
+V_{\text{key}} = \left[ v_i \in V | s_i \text{ is among the top } K_{\text{key}} \text{ scores in } \{s_k\}^{N_{\text{total}}}_{k=1}\right] (4 \lt K_{\text{key}} \lt 8)
+$$
+
+The visual tokens that are not yet selected are stored in $V_{\text{rem}}$. To supplement the core set $V_{\text{key}}$ and reach the target final token count $K_{\text{final}}$, an additional 
+$K_{\text{aug}} = K_{\text{final}} - K_{\text{key}}$ tokens are selected from $V_{\text{rem}}$.
+
+To do this, more task-related and high-diversity tokens are selected. The idea is simple – for task-related tokens, just extract $K_{\text{task}}=\lfloor \alpha \times K_{\text{aug}}\rfloor (\alpha \in [0, 1])$ tokens with 
+highst relevance scores $s_i$.
+
+Then for high-diversity tokens, tokens with the lowest cosine similarity to the tokens in $V_{\text{key}}$ are selected from $V_{\text{rem}}$ to form $V_{\text{div}}$. The diversity score can be written as:
+
+$$
+\text{Diversity}(v_j, V_{\text{key}}) = 1 - \max_{v_k \in V_{key}} \frac{v_j \cdot v_k}{\| v_j \|_2 \| v_k \|_2}
+$$
+
+The final set of retain visual tokens is then defined as:
+
+$$
+V_{\text{final}} = V_{\text{key}} \cup V_{\text{task}} \cup V_{\text{div}}
+$$
+
+
+### Caching intermediate features
+So far, layers from the language model of the VLM and the visual tokens are pruned. In diffusion-based VLAs, another part remains – the action decoder. 
+The action decoder is great for generating dexterous actions, but it comes at a cost. It uses iterative self-attention and MLP computations over $T$ timesteps, imposing significant computational overhead.
+
+Typically, in diffusion transformers (action decoders), when input features $z_t$ are given at timestep $t$, the computations used are:
+
+$$
+h^{\text{attn}}_t = \text{SA}(z_t)
+$$
+
+$$
+h^{\text{mlp}}_t = \text{MLP}(h^{\text{attn}}_t + z_t)
+$$
+
+One interesting fact about this is that the hidden states of each module have a strong temporal coherence, such that $h^{\text{module}}_t \approx h^{\text{module}}_{t-1}$, so caching can reduce expensive memory access.
+
+The caching mechanism works by first defining the cache interval $N (1 \leq N \lt T_{\mathrm{start}})$. At the initial timestep $T_{\mathrm{start}}$, $h^{\text{attn}}_t$ and $h^{\text{mlp}}_t$ are stored in the cache 
+(they are denoted as $\mathcal{C}_{\mathrm{attn}}$ and $\mathcal{C}_{\mathrm{mlp}}$, respectively). 
+
+Then at each cache interval, the cache is updated, and never for other timesteps. In other words, the self-attention and MLP layers are bypassed whenever the timestep is not a multiple of the cache interval, so the expensive
+self-attention and MLP operations only happen once every $N$ timesteps.
+
+## EfficientVLA
+<Architecture />
+
+The architecture of EfficientVLA mirrors the VLA acceleration mechanisms above. The Prismatic VLM is used as the backbone, which consists of SigLIP + DINOv2 as the vision encoder.
+
+## The performance
+### SIMPLER benchmark
+
+<DataTable
+	columns={[
+		{ label: 'Method' },
+		{ label: 'Training-free', align: 'center' },
+		{ label: 'PickCan', align: 'right', best: 'max' },
+		{ label: 'MoveNear', align: 'right', best: 'max' },
+		{ label: 'Drawer', align: 'right', best: 'max' },
+		{ label: 'DrawerApple', align: 'right', best: 'max' },
+		{ label: 'Average', align: 'right', best: 'max' },
+		{ label: 'FLOPs↓', align: 'right', best: 'min' },
+		{ label: 'Speedup↑', align: 'right', best: 'max' },
+		{ label: 'Params (B)', align: 'right' },
+	]}
+	groups={[
+		{
+			label: 'Visual Matching',
+			rows: [
+				{ cells: ['CogACT', '–', '91.3%', '85.0%', '71.8%', '50.9%', '74.8%', '100.0%', '1.00×', '7.63'], tone: 'baseline' },
+				{ cells: ['Random Dropping', '✓', '9.7%', '20.4%', '53.5%', '0.0%', '20.9%', '58.5%', '1.20×', '7.63'], tone: 'muted' },
+				['FastV', '✓', '92.6%', '81.4%', '69.8%', '52.4%', '74.1%', '42.0%', '1.21×', '7.63'],
+				['VLA-Cache', '✓', '92.0%', '83.3%', '70.5%', '51.6%', '74.4%', '80.1%', '1.38×', '7.63'],
+				{ cells: ['**EfficientVLA** (L=28, T=112)', '✓', '95.3%', '83.3%', '70.3%', '56.5%', '76.4%', '45.1%', '1.59×', '5.87'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=28, T=56)', '✓', '94.7%', '82.4%', '69.8%', '55.4%', '75.5%', '32.9%', '1.71×', '5.87'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=22, T=112)', '✓', '94.0%', '82.1%', '69.2%', '54.6%', '75.0%', '38.2%', '1.78×', '4.86'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=22, T=56)', '✓', '93.3%', '81.3%', '68.2%', '53.8%', '74.2%', '28.9%', '1.93×', '4.86'], tone: 'ours' },
+			],
+		},
+		{
+			label: 'Variant Aggregation',
+			rows: [
+				{ cells: ['CogACT', '–', '89.6%', '80.8%', '28.3%', '46.6%', '61.3%', '100.0%', '1.00×', '7.63'], tone: 'baseline' },
+				{ cells: ['Random Dropping', '✓', '4.0%', '16.1%', '15.6%', '0.0%', '8.9%', '58.5%', '1.20×', '7.63'], tone: 'muted' },
+				['FastV', '✓', '91.4%', '78.6%', '27.6%', '50.6%', '62.1%', '42.0%', '1.19×', '7.63'],
+				['VLA-Cache', '✓', '91.7%', '79.3%', '32.5%', '45.8%', '62.3%', '82.6%', '1.37×', '7.63'],
+				{ cells: ['**EfficientVLA** (L=28, T=112)', '✓', '94.8%', '77.6%', '28.4%', '51.9%', '63.2%', '45.1%', '1.57×', '5.87'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=28, T=56)', '✓', '94.4%', '77.2%', '27.6%', '51.3%', '62.6%', '32.9%', '1.69×', '5.87'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=22, T=112)', '✓', '93.9%', '76.4%', '27.3%', '50.6%', '62.1%', '38.2%', '1.76×', '4.86'], tone: 'ours' },
+				{ cells: ['**EfficientVLA** (L=22, T=56)', '✓', '93.2%', '75.8%', '26.9%', '49.2%', '61.2%', '28.9%', '1.91×', '4.86'], tone: 'ours' },
+			],
+		},
+	]}
+	caption="Success rate on the SIMPLER benchmark with CogACT as the base model. The best value in each setting is in bold."
+	note="L: number of language-model layers kept. T: number of visual tokens kept."
+/>
+
+EfficientVLA achieves strong performance with its training-free structured pruning and token selection. Pruning 10 layers while retaining 112 visual tokens outperforms both CogACT and VLA-Cache 
+in success rate and inference speed. Notably, pruning 36% of the parameters even improves the success rate on pick coke can from 91.3% to 94.0%, suggesting substantial parameter redundancy in the VLA model. 
+
+Guided token selection is also important: randomly reducing the visual tokens to 112 drops the average success rate to 20.9%, whereas a 22-layer, 56-token configuration reduces FLOPs by 71.1% with only a 0.6% 
+drop in average success rate. In contrast, token-only methods such as FastV achieve only a 1.21× speedup, highlighting the importance of addressing bottlenecks beyond visual token computation.
+
+### Pruning & caching
+<DataTable
+	columns={[
+		{ label: 'Metric' },
+		{ label: 'Vision Module', align: 'right' },
+		{ label: 'Language Module', align: 'right' },
+		{ label: 'Action Module', align: 'right' },
+	]}
+	rows={[
+		['#Param (M)', '802.3 → 802.3', '6738.9 → 3971.1 (↓41%)', '89.0 → 89.0'],
+		['Vision Token', '256 → 256', '256 → 56 (↓78%)', '-'],
+		['Denoising Steps', '-', '-', '10 → 2 (↓80%)'],
+		['Inference Time (ms)', '24.9 → 24.9', '134.5 → 58.9 (↓56%)', '51.5 → 26.1 (↓49%)'],
+		['FLOPs (G)', '405.50 → 405.50', '3726.55 → 792.58 (↓78%)', '57.96 → 11.72 (↓80%)'],
+	]}
+	caption="CogACT → EfficientVLA, module by module."
+/>
+
+The table above compares EfficientVLA with the original CogACT. Through pruning and caching, EfficientVLA reduces the parameter count of the language module by 41% and the number of visual tokens by 78%. 
+These reductions lead to a 78% reduction in language-module FLOPs, from 3726.55G to 792.58G. The action module also benefits from reducing the number of denoising steps from 10 to 2, resulting in an 80%
+reduction in FLOPs and a 49% reduction in inference time. Meanwhile, the inference time of the language module decreases by 56%.
+
+## Conclusion
+The main idea behind EfficientVLA is simple: a VLA's cost isn't in one place, so speeding up one component just moves the bottleneck. Cutting visual tokens alone barely helps while inference is memory-bound, and pruning the language model does nothing for the action head, which re-runs at every denoising step. EfficientVLA targets all three at once — it prunes layers that barely change their input, keeps a small but diverse set of visual tokens, and reuses attention/MLP features across denoising steps.
+
+On CogACT in SIMPLER, that gives a 1.93× speedup and cuts FLOPs to 28.9% of the original, at a cost of 0.6% in success rate. And it needs no retraining, so in principle it applies to any pretrained diffusion-based VLA.
+
+A few things I'd want to see next:
+
+**1. More models and real robots** <br/>
+Results are reported on a single model in simulation. Redundancy patterns like the layer-similarity heatmap may look quite different in other architectures.
+
+**2. Sensitivity to the knobs** <br/>
+Training-free still means choices: how many layers to cut, the $K$ values for each token set, and how often to recompute the cache. How much tuning does each new task need?
+
+**3. Where the 0.6% goes** <br/>
+An average can hide a few tasks that fail badly, which matters more for a robot than a small average drop.
