@@ -219,6 +219,24 @@ th {
 	white-space: nowrap;
 }
 
+/* Tables whose cells hold sentences wrap to the column instead. The first
+   column (usually a name) stays on one line; the rest share the remainder. */
+.table-scroll--wrap table {
+	width: 100%;
+}
+
+.table-scroll--wrap th,
+.table-scroll--wrap td {
+	white-space: normal;
+	vertical-align: top;
+	min-width: 11em;
+}
+
+.table-scroll--wrap :is(th, td):first-child {
+	white-space: nowrap;
+	min-width: 0;
+}
+
 /* ── Layout helpers ── */
 .container {
 	width: min(100% - 2 * var(--space-lg), var(--max-width));

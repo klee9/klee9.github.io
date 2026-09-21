@@ -22,6 +22,25 @@ const POSTS_DIR = fileURLToPath(new URL('./src/content/blog', import.meta.url));
  * usual CSS-only workaround — throws away real table layout and with it the
  * column sizing. Hand-written so it costs no dependency.
  */
+/** A cell longer than this (in characters) marks the table as prose. */
+const WRAP_THRESHOLD = 40;
+
+const textOf = (node: any): string =>
+	node.type === 'text' ? node.value : (node.children ?? []).map(textOf).join('');
+
+function longestCell(table: any): number {
+	let max = 0;
+	const visit = (node: any) => {
+		if (node.type === 'element' && (node.tagName === 'td' || node.tagName === 'th')) {
+			max = Math.max(max, textOf(node).trim().length);
+			return;
+		}
+		(node.children ?? []).forEach(visit);
+	};
+	visit(table);
+	return max;
+}
+
 function rehypeScrollableTables() {
 	/** @param {any} node */
 	return (tree: any) => {
@@ -30,11 +49,13 @@ function rehypeScrollableTables() {
 			node.children = node.children.map((child: any) => {
 				walk(child);
 				if (child.type !== 'element' || child.tagName !== 'table') return child;
+				// Tables of sentences wrap; tables of numbers and short labels scroll.
+				const prose = longestCell(child) > WRAP_THRESHOLD;
 				return {
 					type: 'element',
 					tagName: 'div',
 					properties: {
-						className: ['table-scroll'],
+						className: prose ? ['table-scroll', 'table-scroll--wrap'] : ['table-scroll'],
 						// A scrollable region needs to be reachable without a mouse.
 						tabIndex: 0,
 						role: 'region',

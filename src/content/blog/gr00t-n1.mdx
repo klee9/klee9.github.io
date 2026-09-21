@@ -10,6 +10,7 @@ import GR00TArchitecture from '../../components/figures/gr00t_n1/GR00TArchitectu
 import DataPyramid from '../../components/figures/gr00t_n1/DataPyramid';
 import DexMimicGen from '../../components/figures/gr00t_n1/DexMimicGen';
 import Benchmarks from '../../components/figures/gr00t_n1/Benchmarks';
+import DataTable from '../../components/DataTable';
 
 ## Why GR00T N1 was created
 The hardware of humanoid robots has advanced remarkably, enabling increasingly versatile capabilities and human-like physical forms. However, for humanoids to operate robustly in novel and unstructured environments, sophisticated physical intelligence is required.
@@ -81,20 +82,39 @@ The evaluation was performed on a pre-trained GR00T-N1-2B model using 5 differen
 
 ## How about after post-training?
 
-|  | RoboCasa | DexMG | GR-1 | Average |
-|---|:---:|:---:|:---:|:---:|
-| BC Transformer | 26.3% | 53.9% | 16.1% | 26.4% |
-| Diffusion Policy | 25.6% | 56.1% | 32.7% | 33.4% |
-| GR00T-N1-2B | 32.1% | 66.5% | 50.0% | 45.0% |
+<DataTable
+	columns={[
+		{ label: '' },
+		{ label: 'RoboCasa', align: 'center', best: 'max' },
+		{ label: 'DexMG', align: 'center', best: 'max' },
+		{ label: 'GR-1', align: 'center', best: 'max' },
+		{ label: 'Average', align: 'center', best: 'max' },
+	]}
+	rows={[
+		['BC Transformer', '26.3%', '53.9%', '16.1%', '26.4%'],
+		['Diffusion Policy', '25.6%', '56.1%', '32.7%', '33.4%'],
+		{ cells: ['GR00T-N1-2B', '32.1%', '66.5%', '50.0%', '45.0%'], tone: 'ours' },
+	]}
+/>
 <br/>
 In simulation, post-trained GR00T N1 is compared against BC Transformer and Diffusion Policy in three simulation benchmarks. We can see that GR00T N1 consistently outperforms the baseline models.
 <br/>
-| Model | Pick-and-Place | Articulated | Industrial | Coordination | Average |
-|---|:---:|:---:|:---:|:---:|:---:|
-| Diffusion Policy (10% Data) | 3.0% | 14.3% | 6.7% | 27.5% | 10.2% |
-| Diffusion Policy (Full Data) | 36.0% | 38.6% | 61.0% | 62.5% | 46.4% |
-| GR00T-N1-2B (10% Data) | 35.0% | 62.0% | 31.0% | 50.0% | 42.6% |
-| **GR00T-N1-2B (Full Data)** | **82.0%** | **70.9%** | **70.0%** | **82.5%** | **76.8%** |
+<DataTable
+	columns={[
+		{ label: 'Model' },
+		{ label: 'Pick-and-Place', align: 'center', best: 'max' },
+		{ label: 'Articulated', align: 'center', best: 'max' },
+		{ label: 'Industrial', align: 'center', best: 'max' },
+		{ label: 'Coordination', align: 'center', best: 'max' },
+		{ label: 'Average', align: 'center', best: 'max' },
+	]}
+	rows={[
+		['Diffusion Policy (10% Data)', '3.0%', '14.3%', '6.7%', '27.5%', '10.2%'],
+		['Diffusion Policy (Full Data)', '36.0%', '38.6%', '61.0%', '62.5%', '46.4%'],
+		['GR00T-N1-2B (10% Data)', '35.0%', '62.0%', '31.0%', '50.0%', '42.6%'],
+		{ cells: ['GR00T-N1-2B (Full Data)', '82.0%', '70.9%', '70.0%', '82.5%', '76.8%'], tone: 'ours' },
+	]}
+/>
 <br/>
 On the real GR-1 humanoid, GR00T-N1-2B is compared against the Diffusion Policy, training on 10% of the human teleoperation dataset and the full dataset. GR00T-N1-2B achieves a significantly higher success rate across all tasks, outperforming Diffusion Policy by 32.4% in the 10% Data setting and by 30.4% in the Full Data setting. Notably, GR00T-N1-2B trained on just 10% of the data performs only 3.8% lower than Diffusion Policy trained on the full dataset, highlighting its data efficiency. 
 

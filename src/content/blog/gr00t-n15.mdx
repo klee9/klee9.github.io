@@ -9,6 +9,7 @@ tags: ['VLA', 'robotics', 'NVIDIA']
 import GR00TArchitecture from '../../components/figures/gr00t_n15/GR00TArchitecture';
 import Term from '../../components/Term';
 import DataMix from '../../components/figures/gr00t_n15/DataMix';
+import DataTable from '../../components/DataTable';
 
 ## What is GR00T N1.5?
 GR00T N1.5 is an improved version of [GR00T N1](/blog/gr00t-n1), with better generalization and language following ability. 
@@ -25,10 +26,18 @@ Structurally, nothing much is different from GR00T N1. It uses the NVIDIA Eagle 
 ## So what changed from N1?
 ### VLM grounding capabilities
 
-| Model | Size | GR-1 grounding IoU (↑) | RefCOCOg-val IoU(↑) |
-|---|:---:|:---:|:---:|
-| Qwen2.5VLM | 3B | 35.5 | 85.2 |
-| GR00T N1.5 VLM | 2.1B | 40.4 | 89.6 |
+<DataTable
+	columns={[
+		{ label: 'Model' },
+		{ label: 'Size', align: 'center' },
+		{ label: 'GR-1 grounding IoU (↑)', align: 'center' },
+		{ label: 'RefCOCOg-val IoU(↑)', align: 'center' },
+	]}
+	rows={[
+		['Qwen2.5VLM', '3B', '35.5', '85.2'],
+		['GR00T N1.5 VLM', '2.1B', '40.4', '89.6'],
+	]}
+/>
 <br/>
 
 The VLM of GR00T N1.5 is Eagle 2.5 tuned for better grounding capabilities and physical understanding. GR00T N1.5 performs favorably compared to Qwen2.5-VL-3B on <Term note="a metric used to evaluate visual grounding—whether a model can correctly locate an object in an image based on a natural-language description">RefCOCOg</Term> and <Term note="NVIDIA's custom dataset used for evaluating visual grounding.">GR-1 grounding dataset</Term>.
@@ -48,27 +57,48 @@ This is particularly useful for learning from human videos, which generally do n
 
 
 ## How does it perform?
-| Benchmark | GR00T N1 (scratch) | GR00T N1.5 (scratch) |
-|---|:---:|:---:|
-| Language table | 52.8% | **93.2%** |
-| Sim GR-1 Language | 36.4% | **54.4%** |
+<DataTable
+	columns={[
+		{ label: 'Benchmark' },
+		{ label: 'GR00T N1 (scratch)', align: 'center' },
+		{ label: 'GR00T N1.5 (scratch)', align: 'center' },
+	]}
+	rows={[
+		['Language table', '52.8%', '**93.2%**'],
+		['Sim GR-1 Language', '36.4%', '**54.4%**'],
+	]}
+/>
 <br/>
 The N1 and N1.5 were trained from scratch on two simulation benchmarks that require language following. The N1.5 achieves significantly higher success rates on both benchmarks, indicating stronger language-conditioned control ability.
 <br/>
 
-| Simulation Benchmark | GR00T N1 | GR00T N1.5 |
-|---|:---:|:---:|
-| RoboCasa (30 demos per task) | 17.4% | **47.5%** |
-| Sim GR-1 (zero-shot) | 39.6% | **43.9%** |
-| Sim GR-1 (30 demos per task) | 43.2% | **47.4%** |
+<DataTable
+	columns={[
+		{ label: 'Simulation Benchmark' },
+		{ label: 'GR00T N1', align: 'center' },
+		{ label: 'GR00T N1.5', align: 'center' },
+	]}
+	rows={[
+		['RoboCasa (30 demos per task)', '17.4%', '**47.5%**'],
+		['Sim GR-1 (zero-shot)', '39.6%', '**43.9%**'],
+		['Sim GR-1 (30 demos per task)', '43.2%', '**47.4%**'],
+	]}
+/>
 <br/>
 As in GR00T N1, N1.5 is evaluated on data-limited post-training. For Sim GR-1, the model was evaluated both few-shot and zer-shot as the pre-training data includes them. Anyhow, the N1.5 records significantly better result in the very low data regime (zero-shot and 30 demos). 
 <br/>
 
-| Setting | GR00T N1 | GR00T N1.5 |
-|---|:---:|:---:|
-| Language following rate | 46.6% | **93.3%** |
-| Overall success rate | 43.3% | **83.0%** |
+<DataTable
+	columns={[
+		{ label: 'Setting' },
+		{ label: 'GR00T N1', align: 'center' },
+		{ label: 'GR00T N1.5', align: 'center' },
+	]}
+	rows={[
+		['Language following rate', '46.6%', '**93.3%**'],
+		['Overall success rate', '43.3%', '**83.0%**'],
+	]}
+/>
 
 In the next experiment, two fruits are on a table and the robot is asked to place one of them onto a plate. The initial position of the target fruit is sampled to be closer to either the left or the right hand with 50% probability.
 

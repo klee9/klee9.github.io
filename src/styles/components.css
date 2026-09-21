@@ -1776,3 +1776,338 @@
 		opacity: 1;
 	}
 }
+
+/* ── EfficientVLA architecture (reuses the .arch wrapper chrome) ── */
+.evla__svg {
+	--evla-vision: var(--arch-vision);
+	--evla-cut: #ff453a;
+}
+
+/* Group frames name a region without competing with the modules inside it. */
+.evla__group-label {
+	font-size: 11px;
+	font-weight: 600;
+	fill: var(--color-text-muted);
+	letter-spacing: 0.01em;
+}
+
+/* The filter is the figure's subject, so it alone wears the accent. */
+.evla__filter-box {
+	fill: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+	stroke: color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+/* Pruned layers read as absent: outlined, not filled. */
+.evla__bar--pruned {
+	fill: none;
+	stroke: color-mix(in srgb, var(--evla-cut) 55%, transparent);
+	stroke-dasharray: 4 3;
+}
+
+.evla__scissor {
+	font-size: 13px;
+	fill: var(--evla-cut);
+	text-anchor: middle;
+}
+
+.evla__scissor-dot {
+	color: var(--evla-cut);
+}
+
+.evla__swatch--vision {
+	background: var(--arch-vision, #af52de);
+}
+
+.evla__swatch--text {
+	background: var(--color-accent);
+}
+
+/* denoising steps */
+.evla__step {
+	fill: var(--color-bg-subtle);
+	stroke: var(--color-border);
+}
+
+.evla__step--cache {
+	fill: none;
+	stroke: color-mix(in srgb, var(--color-accent) 45%, transparent);
+	stroke-dasharray: 4 3;
+}
+
+.evla__step-label {
+	font-size: 9.5px;
+	fill: var(--color-text-muted);
+	text-anchor: middle;
+}
+
+/* the filter's own panel, hung below the pipeline it belongs to */
+.evla__panel {
+	fill: color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-alt));
+	stroke: var(--color-border);
+	stroke-dasharray: 5 4;
+}
+
+.evla__cell {
+	fill: var(--color-accent);
+	stroke: var(--color-bg);
+	stroke-width: 0.5;
+}
+
+.evla__set-box {
+	fill: var(--color-bg);
+	stroke: var(--color-border-strong);
+}
+
+.evla__set-tok {
+	fill: var(--evla-vision);
+}
+
+.evla__set-label {
+	font-size: 10.5px;
+	font-weight: 600;
+	fill: var(--color-text-bright);
+	text-anchor: middle;
+}
+
+/* The accent outline belongs to the box, not to a wrapper rect. */
+.arch__node--accent:hover .evla__filter-box,
+.arch__node--accent.is-active .evla__filter-box {
+	stroke: var(--color-accent);
+	stroke-width: 2;
+}
+
+/* ── EfficientVLA redundancy figure (three small panels) ── */
+.red__panels {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: var(--space-md);
+}
+
+.red__panel {
+	margin: 0;
+}
+
+.red__svg {
+	display: block;
+	width: 100%;
+	height: auto;
+	overflow: visible;
+	font-family: var(--font-sans);
+}
+
+/* .prose p justifies every paragraph, so these need the same specificity. */
+.red__label,
+.prose .red__label {
+	margin: var(--space-xs) 0 0;
+	font-size: 0.8125rem;
+	text-align: center;
+	color: var(--color-text-muted);
+}
+
+.red__chart-title {
+	font-size: 10.5px;
+	font-weight: 600;
+	fill: var(--color-text-muted);
+}
+
+.red__line {
+	fill: none;
+	stroke: var(--color-accent);
+	stroke-width: 2;
+	stroke-linejoin: round;
+}
+
+.red__dot {
+	fill: var(--color-accent);
+	stroke: var(--color-bg);
+	stroke-width: 1.5;
+	transition: r var(--dur-fast) var(--ease-out);
+}
+
+/* The regime is context, not data: a whisper of tint. */
+.red__regime {
+	fill: var(--color-bg-subtle);
+}
+
+.red__regime-label {
+	font-size: 9.5px;
+	fill: var(--color-text-subtle);
+	text-anchor: middle;
+}
+
+.red__crosshair {
+	stroke: var(--color-text-subtle);
+	stroke-width: 1;
+	stroke-dasharray: 3 3;
+	pointer-events: none;
+}
+
+.red__hit {
+	fill: transparent;
+	cursor: crosshair;
+}
+
+/* heatmaps: the paper's YlGnBu scale, colour bars and labels */
+.red__tick--mid {
+	fill: var(--color-text-muted);
+	font-size: 9px;
+	text-anchor: middle;
+}
+
+.red__cell:hover {
+	stroke: var(--color-text-bright);
+	stroke-width: 1;
+}
+
+.red__cbar-tick {
+	font-size: 8.5px;
+	fill: var(--color-text-muted);
+}
+
+.red__serif {
+	font-size: 11px;
+	fill: var(--color-text-muted);
+	text-anchor: middle;
+}
+
+.red__readout,
+.prose .red__readout {
+	margin: var(--space-sm) 0 0;
+	text-align: left;
+	font-size: 0.8125rem;
+	color: var(--color-text-muted);
+	font-variant-numeric: tabular-nums;
+	min-height: 1.4em;
+}
+
+/* ── DataTable: results tables for posts ── */
+.dt,
+.prose .dt {
+	margin: var(--space-lg) 0;
+}
+
+.dt__scroll {
+	overflow-x: auto;
+	outline: none;
+	border-radius: var(--radius-sm);
+}
+
+.dt__scroll:focus-visible {
+	outline: 2px solid var(--color-accent);
+	outline-offset: 2px;
+}
+
+.dt__table {
+	width: 100%;
+	margin: 0;
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: 0.875rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.dt__table th,
+.dt__table td {
+	padding: 0.55em 0.8em;
+	border-bottom: 1px solid var(--color-border);
+	white-space: nowrap;
+	background: var(--dt-row-bg, var(--color-bg));
+	transition: background var(--dur-fast) var(--ease-out);
+}
+
+/* header: a heavier rule, and quieter labels than the data */
+.dt__table thead th {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: var(--color-text-muted);
+	border-bottom: 1.5px solid var(--color-border-strong);
+	vertical-align: bottom;
+}
+
+/* row headers (first column) read as names, not data */
+.dt__table tbody th {
+	font-weight: 500;
+	color: var(--color-text-bright);
+}
+
+/* The first column stays put while the numbers scroll under it. */
+.dt__table tr > :first-child {
+	position: sticky;
+	left: 0;
+	z-index: 1;
+}
+
+.dt__cell--left {
+	text-align: left;
+}
+
+.dt__cell--center {
+	text-align: center;
+}
+
+.dt__cell--right {
+	text-align: right;
+}
+
+/* A sentence column wraps and keeps a readable measure. */
+.dt__table .dt__cell--wrap {
+	white-space: normal;
+	min-width: 14em;
+	vertical-align: top;
+}
+
+.dt__cell--best {
+	font-weight: 650;
+	color: var(--color-text-bright);
+}
+
+/* group header rows */
+.dt__table .dt__group th {
+	padding-top: 1.1em;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--color-text-subtle);
+	border-bottom: 1px solid var(--color-border-strong);
+}
+
+.dt__group-label {
+	position: sticky;
+	left: 0.8em;
+}
+
+.dt__table tbody:first-of-type .dt__group th {
+	padding-top: 0.7em;
+}
+
+/* Tints are opaque (mixed into the page colour) so the pinned first column
+   hides what scrolls beneath it. */
+.dt__row--baseline {
+	--dt-row-bg: color-mix(in srgb, var(--color-text) 5%, var(--color-bg));
+}
+
+.dt__row--ours {
+	--dt-row-bg: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg));
+}
+
+.dt__row--muted > * {
+	color: var(--color-text-subtle);
+}
+
+.dt__table tbody tr:not(.dt__group):hover {
+	--dt-row-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg));
+}
+
+.dt__caption {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+	margin-top: var(--space-sm);
+	font-size: 0.8125rem;
+	color: var(--color-text-subtle);
+}
+
+.dt__note {
+	font-size: 0.75rem;
+}
