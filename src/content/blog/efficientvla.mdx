@@ -57,45 +57,45 @@ input and output hidden state vectors, respectively, at position $j$ of sample $
 The equation is simply one minus the average cosine similarity of a layer $\ell$, so the higher the cosine similarity between the input and output hidden state vectors, 
 the closer the importance score is to 0, and vice versa.
 
-The importance score is computed for all layers, then these scores are ranked, yielding $\mathcal{L}_{\text{ranked}} = \left[ \ell_{(0)}, \ell_{(1)}, \cdots, \ell{(N)} \right]$. The first $n$ layers are pruned from the language model.
+The importance score is computed for all layers, then these scores are ranked, yielding $\mathcal{L}_{\mathrm{ranked}} = \left[ \ell_{(0)}, \ell_{(1)}, \cdots, \ell{(N)} \right]$. The first $n$ layers are pruned from the language model.
 
 
 ### Visual token pruning
 Visual tokens contain rich information. Yes, this is good, but they come along with redundancy, causing computational and memeory overhead. They come in two forms: tokens with low task relevance, and tokens that contain
 duplicate information due to inherent visual similarities within the input.
 
-Then how can task relevance be defined? For all visual tokens $v_i$, the attention from $v_i$ towards $L_{ctx}$ task-defining contextual embeddings, such as language instruction, is captured via cross-attention between $v_i$ and selected VLM layers.
+Then how can task relevance be defined? For all visual tokens $v_i$, the attention from $v_i$ towards $L_{ctx}$ task-defining conmathrmual embeddings, such as language instruction, is captured via cross-attention between $v_i$ and selected VLM layers.
 The task relevance score $r_i$ is defined using this information:
 
 $$
 r_i = \sum_{j}^{L_{ctx}} \left( \frac{1}{H} \sum_{h=1}^{H} A^{(h)}_{i, j} \right)
 $$
 
-Here, $A^{(h)}_{i, j}$ means the attention score from visual token $v_i$ to the $j$-th contextual token in the $h$-th attention head. In other words, this equation computes the sum of attention scores 
-between a visual token $v_i$ and task-relevant contextual tokens averaged over all attention heads. 
+Here, $A^{(h)}_{i, j}$ means the attention score from visual token $v_i$ to the $j$-th conmathrmual token in the $h$-th attention head. In other words, this equation computes the sum of attention scores 
+between a visual token $v_i$ and task-relevant conmathrmual tokens averaged over all attention heads. 
 
 The relevance scores are normalized to $s_i \in [0, 1]$ for robust comparison and future token selection. Then, a part of visual tokens to keep are defined as:
 
 $$
-V_{\text{key}} = \left[ v_i \in V | s_i \text{ is among the top } K_{\text{key}} \text{ scores in } \{s_k\}^{N_{\text{total}}}_{k=1}\right] (4 \lt K_{\text{key}} \lt 8)
+V_{\mathrm{key}} = \left[ v_i \in V | s_i \text{ is among the top } K_{\mathrm{key}} \text{ scores in } \{s_k\}^{N_{\mathrm{total}}}_{k=1}\right] (4 \lt K_{\mathrm{key}} \lt 8)
 $$
 
-The visual tokens that are not yet selected are stored in $V_{\text{rem}}$. To supplement the core set $V_{\text{key}}$ and reach the target final token count $K_{\text{final}}$, an additional 
-$K_{\text{aug}} = K_{\text{final}} - K_{\text{key}}$ tokens are selected from $V_{\text{rem}}$.
+The visual tokens that are not yet selected are stored in $V_{\mathrm{rem}}$. To supplement the core set $V_{\mathrm{key}}$ and reach the target final token count $K_{\mathrm{final}}$, an additional 
+$K_{\mathrm{aug}} = K_{\mathrm{final}} - K_{\mathrm{key}}$ tokens are selected from $V_{\mathrm{rem}}$.
 
-To do this, more task-related and high-diversity tokens are selected. The idea is simple – for task-related tokens, just extract $K_{\text{task}}=\lfloor \alpha \times K_{\text{aug}}\rfloor (\alpha \in [0, 1])$ tokens with 
+To do this, more task-related and high-diversity tokens are selected. The idea is simple – for task-related tokens, just extract $K_{\mathrm{task}}=\lfloor \alpha \times K_{\mathrm{aug}}\rfloor (\alpha \in [0, 1])$ tokens with 
 highst relevance scores $s_i$.
 
-Then for high-diversity tokens, tokens with the lowest cosine similarity to the tokens in $V_{\text{key}}$ are selected from $V_{\text{rem}}$ to form $V_{\text{div}}$. The diversity score can be written as:
+Then for high-diversity tokens, tokens with the lowest cosine similarity to the tokens in $V_{\mathrm{key}}$ are selected from $V_{\mathrm{rem}}$ to form $V_{\mathrm{div}}$. The diversity score can be written as:
 
 $$
-\text{Diversity}(v_j, V_{\text{key}}) = 1 - \max_{v_k \in V_{key}} \frac{v_j \cdot v_k}{\| v_j \|_2 \| v_k \|_2}
+\mathrm{Diversity}(v_j, V_{\mathrm{key}}) = 1 - \max_{v_k \in V_{key}} \frac{v_j \cdot v_k}{\| v_j \|_2 \| v_k \|_2}
 $$
 
 The final set of retain visual tokens is then defined as:
 
 $$
-V_{\text{final}} = V_{\text{key}} \cup V_{\text{task}} \cup V_{\text{div}}
+V_{\mathrm{final}} = V_{\mathrm{key}} \cup V_{\mathrm{task}} \cup V_{\mathrm{div}}
 $$
 
 
@@ -106,16 +106,16 @@ The action decoder is great for generating dexterous actions, but it comes at a 
 Typically, in diffusion transformers (action decoders), when input features $z_t$ are given at timestep $t$, the computations used are:
 
 $$
-h^{\text{attn}}_t = \text{SA}(z_t)
+h^{\mathrm{attn}}_t = \mathrm{SA}(z_t)
 $$
 
 $$
-h^{\text{mlp}}_t = \text{MLP}(h^{\text{attn}}_t + z_t)
+h^{\mathrm{mlp}}_t = \mathrm{MLP}(h^{\mathrm{attn}}_t + z_t)
 $$
 
-One interesting fact about this is that the hidden states of each module have a strong temporal coherence, such that $h^{\text{module}}_t \approx h^{\text{module}}_{t-1}$, so caching can reduce expensive memory access.
+One interesting fact about this is that the hidden states of each module have a strong temporal coherence, such that $h^{\mathrm{module}}_t \approx h^{\mathrm{module}}_{t-1}$, so caching can reduce expensive memory access.
 
-The caching mechanism works by first defining the cache interval $N (1 \leq N \lt T_{\mathrm{start}})$. At the initial timestep $T_{\mathrm{start}}$, $h^{\text{attn}}_t$ and $h^{\text{mlp}}_t$ are stored in the cache 
+The caching mechanism works by first defining the cache interval $N (1 \leq N \lt T_{\mathrm{start}})$. At the initial timestep $T_{\mathrm{start}}$, $h^{\mathrm{attn}}_t$ and $h^{\mathrm{mlp}}_t$ are stored in the cache 
 (they are denoted as $\mathcal{C}_{\mathrm{attn}}$ and $\mathcal{C}_{\mathrm{mlp}}$, respectively). 
 
 Then at each cache interval, the cache is updated, and never for other timesteps. In other words, the self-attention and MLP layers are bypassed whenever the timestep is not a multiple of the cache interval, so the expensive
