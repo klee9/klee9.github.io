@@ -4,6 +4,9 @@ import { Head } from 'vite-react-ssg';
 import { SITE, ANALYTICS } from '../consts';
 import { pageview } from '../lib/analytics';
 import Header from '../components/Header';
+
+/** The site name, plus the tagline only when there is one. */
+const homeTitle = SITE.tagline ? `${SITE.title} — ${SITE.tagline}` : SITE.title;
 import Footer from '../components/Footer';
 
 const gaId = import.meta.env.PROD && ANALYTICS.gaMeasurementId ? ANALYTICS.gaMeasurementId : null;
@@ -37,7 +40,7 @@ export default function BaseLayout() {
 		<>
 			<Head>
 				<meta name="description" content={SITE.description} />
-				<title>{`${SITE.title} — ${SITE.tagline}`}</title>
+				<title>{homeTitle}</title>
 				{gaId && <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />}
 				{gaId && (
 					<script>{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${gaId}');`}</script>
@@ -73,7 +76,7 @@ interface PageMetaProps {
 
 /** Per-page <title> and description; drop it at the top of any page component. */
 export function PageMeta({ title, description = SITE.description }: PageMetaProps) {
-	const pageTitle = title ? `${title} · ${SITE.title}` : `${SITE.title} — ${SITE.tagline}`;
+	const pageTitle = title ? `${title} · ${SITE.title}` : homeTitle;
 	return (
 		<Head>
 			<title>{pageTitle}</title>
